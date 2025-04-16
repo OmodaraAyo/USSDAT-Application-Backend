@@ -20,4 +20,5 @@ public class CompanyAdmin {
     private boolean isFirstLogin;
     private String createdAt;
     private String updatedAt;
+
 }
