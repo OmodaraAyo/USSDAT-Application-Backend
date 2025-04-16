@@ -18,4 +18,6 @@ public class CompanyAdmin {
     private String password;
     private String lastLoginDate;
     private boolean isFirstLogin;
+    private String createdAt;
+    private String updatedAt;
 }
