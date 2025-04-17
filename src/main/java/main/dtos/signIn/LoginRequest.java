@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class AdminRequest {
+public class LoginRequest {
     private String companyEmail;
     private String password;
 }
