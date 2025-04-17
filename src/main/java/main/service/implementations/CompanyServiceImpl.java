@@ -3,7 +3,6 @@ package main.service.implementations;
 import main.dtos.signUp.CompanyRequest;
 import main.dtos.signUp.CompanyResponse;
 import main.models.Company;
-import main.repository.CompanyAdminRepo;
 import main.repository.CompanyRepo;
 import main.service.interfaces.CompanyService;
 import main.utils.DateUtil;
@@ -18,9 +17,6 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     private CompanyRepo companyRepo;
-
-    @Autowired
-    private CompanyAdminRepo companyAdminRepo;
 
     @Autowired
     private UssdCounterUtil ussdCounterUtil;

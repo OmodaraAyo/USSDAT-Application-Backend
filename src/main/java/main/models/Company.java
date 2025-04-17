@@ -20,11 +20,14 @@ public class Company {
     private String companyName;
     private String companyPhone;
     private String companyEmail;
+    private String password;
     private String businessRegistrationNumber;
     private Category category;
     private String companyApiKey;
     private String apiKey;
     private String baseUrl;
+    private boolean isFirstLogin;
+    private String lastLoginDate;
     private String createAt;
     private String updateAt;
     private boolean isActive;
