@@ -37,7 +37,6 @@ public class CompanyServiceImpl implements CompanyService {
         newCompany.setUssdShortCode(newUssdCode);
         newCompany.setCompanyName(companyRequest.getCompanyName());
         newCompany.setCompanyEmail(companyRequest.getCompanyEmail());
-        newCompany.setCompanyAddress(companyRequest.getCompanyAddress());
         newCompany.setCompanyPhone(companyRequest.getCompanyPhone());
         newCompany.setCategory(companyRequest.getCategory());
         newCompany.setCreateAt(DateUtil.getCurrentDate());

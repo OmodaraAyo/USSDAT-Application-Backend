@@ -18,7 +18,6 @@ public class Company {
     @Indexed(unique = true)
     private String ussdShortCode;
     private String companyName;
-    private String companyAddress;
     private String companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
