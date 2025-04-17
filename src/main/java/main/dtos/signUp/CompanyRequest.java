@@ -10,7 +10,6 @@ import main.models.enums.Category;
 @ToString
 public class CompanyRequest {
     private String companyName;
-    private String companyAddress;
     private String companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
