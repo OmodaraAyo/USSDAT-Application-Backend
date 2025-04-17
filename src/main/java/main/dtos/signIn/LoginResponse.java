@@ -10,7 +10,7 @@ import main.models.enums.Category;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AdminResponse {
+public class LoginResponse {
     private String adminId;
     private String companyId;
     private String ussdShortCode;
