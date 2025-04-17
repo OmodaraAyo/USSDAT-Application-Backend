@@ -1,9 +1,8 @@
 package main.config;
 
 import main.models.Company;
-import main.models.CompanyAdmin;
 import main.models.CompanyPrincipal;
-import main.repository.CompanyAdminRepo;
+import main.repository.CompanyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,16 +12,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 
-    private final CompanyAdminRepo companyAdminRepo;
+    private final CompanyRepo companyRepo;
 
     @Autowired
-    public MyUserDetailsService(CompanyAdminRepo companyAdminRepo) {
-        this.companyAdminRepo = companyAdminRepo;
+    public MyUserDetailsService(CompanyRepo companyRepo) {
+        this.companyRepo = companyRepo;
     }
 
     @Override
     public UserDetails loadUserByUsername(String companyEmail) throws UsernameNotFoundException {
-        CompanyAdmin company = companyAdminRepo.findByCompanyEmail(companyEmail);
+        Company company = companyRepo.findByCompanyEmail(companyEmail);
         if (company == null) {
             throw new UsernameNotFoundException("Company with account:" +companyEmail+" not found");
         }
