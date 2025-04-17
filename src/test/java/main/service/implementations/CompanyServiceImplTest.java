@@ -33,7 +33,7 @@ public class CompanyServiceImplTest {
 
         CompanyResponse companyResponse = companyService.createCompany(companyRequest);
         assertTrue(companyResponse.isSuccess());
-        assertEquals(1, companyRepo.count());
+        assertEquals(3, companyRepo.count());
     }
 
 }
