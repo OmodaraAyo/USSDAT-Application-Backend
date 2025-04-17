@@ -1,6 +1,6 @@
 package main.utils;
 
-import main.models.UssdCounter;
+import main.models.utils.UssdCounter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.FindAndModifyOptions;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -20,6 +20,7 @@ public class UssdCounterUtil {
         Update update = new Update().inc("ussdCode", 1);
         FindAndModifyOptions options = new FindAndModifyOptions().returnNew(true).upsert(true);
         UssdCounter ussdCounter = mongoTemplate.findAndModify(query, update, options, UssdCounter.class);
+        assert ussdCounter != null;
         int next = ussdCounter.getUssdCode();
 
         if(next > 900){

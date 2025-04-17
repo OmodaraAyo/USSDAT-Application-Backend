@@ -1,6 +1,6 @@
 package main.repository;
 
-import main.models.Company;
+import main.models.users.Company;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 

@@ -2,7 +2,8 @@ package main.service.implementations;
 
 import main.dtos.signUp.CompanyRequest;
 import main.dtos.signUp.CompanyResponse;
-import main.models.Company;
+import main.exceptions.ValidatorException;
+import main.models.users.Company;
 import main.repository.CompanyRepo;
 import main.service.interfaces.CompanyService;
 import main.utils.DateUtil;
@@ -26,23 +27,36 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyResponse createCompany(CompanyRequest companyRequest) {
-        int ussdCode = ussdCounterUtil.getNextUssdCode();
-        String newUssdCode = String.valueOf(100 + ussdCode - 1);
+        validateRequestData(companyRequest);
+        return registerNewCompany(companyRequest);
+    }
+
+    private CompanyResponse registerNewCompany(CompanyRequest companyRequest) {
         Company newCompany = new Company();
-        newCompany.setApiKey(GeneratorUtil.generateApiKey());
-        newCompany.setUssdShortCode(newUssdCode);
         newCompany.setCompanyName(companyRequest.getCompanyName());
-        newCompany.setCompanyEmail(companyRequest.getCompanyEmail());
-        newCompany.setCompanyAddress(companyRequest.getCompanyAddress());
         newCompany.setCompanyPhone(companyRequest.getCompanyPhone());
+        newCompany.setCompanyEmail(companyRequest.getCompanyEmail());
+        newCompany.setPassword(bCryptPasswordEncoder.encode(GeneratorUtil.generateKey(16)));
+        newCompany.setApiKey(GeneratorUtil.generateKey(32));
+        newCompany.setUssdShortCode(generateUssdCode());
+        newCompany.setBusinessRegistrationNumber(companyRequest.getBusinessRegistrationNumber());
         newCompany.setCategory(companyRequest.getCategory());
         newCompany.setCreateAt(DateUtil.getCurrentDate());
         newCompany.setUpdateAt(DateUtil.getCurrentDate());
         newCompany.setActive(true);
-
-        Company savedCompany = companyRepo.save(newCompany);
-//        CompanyResponse companyResponse = new CompanyResponse();
-//        companyResponse.setSuccess(Boolean.TRUE);
+        newCompany.setFirstLogin(true);
+        companyRepo.save(newCompany);
         return new CompanyResponse(){{setSuccess(true);}};
+    }
+
+    private void validateRequestData(CompanyRequest companyRequest) {
+        ValidatorException.validateCompanyName(companyRequest.getCompanyName());
+        ValidatorException.validateEmail(companyRequest.getCompanyEmail());
+        ValidatorException.validatePhoneNumber(companyRequest.getCompanyPhone());
+    }
+
+    private String generateUssdCode() {
+        int ussdCode = ussdCounterUtil.getNextUssdCode();
+        return String.valueOf(100 + ussdCode - 1);
     }
 }
