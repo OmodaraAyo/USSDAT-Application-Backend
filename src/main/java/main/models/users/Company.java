@@ -1,4 +1,4 @@
-package main.models;
+package main.models.users;
 
 import lombok.*;
 import main.models.enums.Category;
@@ -26,9 +26,9 @@ public class Company {
     private String companyApiKey;
     private String apiKey;
     private String baseUrl;
+    private boolean isActive;
     private boolean isFirstLogin;
     private String lastLoginDate;
     private String createAt;
     private String updateAt;
-    private boolean isActive;
 }
