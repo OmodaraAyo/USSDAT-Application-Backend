@@ -2,6 +2,7 @@ package main.exceptions;
 
 
 import main.dtos.signUp.CompanyRequest;
+import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.List;
@@ -60,5 +61,9 @@ public class ValidatorException extends RuntimeException {
         if(companyRequest.getCategory() == null){
             throw new ValidatorException("You must select a category");
         }
+    }
+
+    public static void validateSelectedCategory(String selectedCategory){
+        Category.getCategory(selectedCategory);
     }
 }
