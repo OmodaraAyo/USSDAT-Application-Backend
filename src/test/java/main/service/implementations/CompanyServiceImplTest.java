@@ -1,7 +1,6 @@
 package main.service.implementations;
 
 import main.UssdAtApplication;
-import main.dtos.company.CompanyDetailsRequest;
 import main.dtos.company.CompanyDetailsResponse;
 import main.dtos.signIn.LoginRequest;
 import main.dtos.signIn.LoginResponse;
@@ -39,8 +38,6 @@ public class CompanyServiceImplTest {
     private CompanyServiceImpl companyService;
 
     CompanyResponse companyResponse;
-    @Autowired
-    private CompanyServiceImpl companyServiceImpl;
 
     @BeforeEach
     public void startAllWithThis(){
@@ -53,9 +50,9 @@ public class CompanyServiceImplTest {
         companyRequest.setCompanyName("Unius");
         companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
         companyRequest.setCompanyPhone(List.of("09012345678"));
-        companyRequest.setCategory(Category.FINANCE);
+        companyRequest.setCategory("finance");
         companyRequest.setBusinessRegistrationNumber("123456789");
-        companyResponse = companyService.createCompany(companyRequest);
+        companyResponse = companyService.registerCompany(companyRequest);
     }
 
 
@@ -70,7 +67,7 @@ public class CompanyServiceImplTest {
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius@1");
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "The following characters are not allowed: @, #, $, %, ,, !, ?, /, \\. Please remove them and try again.", exception.getMessage());
         assertEquals(1, companyRepo.count());
@@ -78,7 +75,7 @@ public class CompanyServiceImplTest {
         ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("@@_#1");
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "The following characters are not allowed: @, #, $, %, ,, !, ?, /, \\. Please remove them and try again.", exception2.getMessage());
         assertEquals(1, companyRepo.count());
@@ -92,7 +89,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024gmail.com");
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
 
         assertEquals( "Invalid email address.", exception.getMessage());
@@ -102,7 +99,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius@gmail@gmail.com");
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid email address.", exception2.getMessage());
         assertEquals(1, companyRepo.count());
@@ -115,7 +112,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("06123687901"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception.getMessage());
         assertEquals(1, companyRepo.count());
@@ -125,7 +122,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("08083  352449"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception2.getMessage());
         assertEquals(1, companyRepo.count());
@@ -135,7 +132,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("08083  24  49"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception3.getMessage());
         assertEquals(1, companyRepo.count());
@@ -145,7 +142,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("080835@@24_-"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception4.getMessage());
         assertEquals(1, companyRepo.count());
@@ -155,7 +152,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("0+0835++24_-"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception5.getMessage());
         assertEquals(1, companyRepo.count());
@@ -165,7 +162,7 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("+80835352449"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception6.getMessage());
         assertEquals(1, companyRepo.count());
@@ -175,10 +172,46 @@ public class CompanyServiceImplTest {
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
             companyRequest.setCompanyPhone(List.of("+23480"));
-            companyService.createCompany(companyRequest);
+            companyService.registerCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception7.getMessage());
         assertEquals(1, companyRepo.count());
+
+        ValidatorException exception8 = assertThrows(ValidatorException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("Unius");
+            companyRequest.setCompanyEmail("unius2024@gmail.com");
+            companyRequest.setCompanyPhone(List.of("Abcdefghijk"));
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals( "Invalid phone number. Please try again", exception8.getMessage());
+        assertEquals(1, companyRepo.count());
+    }
+
+    @Test
+    public void testCategoryValidationFailsForInvalidCategory(){
+        ValidatorException exception = assertThrows(ValidatorException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("Unius");
+            companyRequest.setCompanyEmail("unius2024@gmail.com");
+            companyRequest.setCompanyPhone(List.of("08123687901"));
+            companyRequest.setCategory("water");
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals( "Invalid category.", exception.getMessage());
+        assertEquals(1, companyRepo.count());
+
+        ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("Unius");
+            companyRequest.setCompanyEmail("unius2024@gmail.com");
+            companyRequest.setCompanyPhone(List.of("08123687901"));
+            companyRequest.setCategory("    ");
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals( "Invalid category.", exception2.getMessage());
+        assertEquals(1, companyRepo.count());
+
     }
 
     @Test
@@ -193,9 +226,9 @@ public class CompanyServiceImplTest {
         companyRequest2.setCompanyName("Sui");
         companyRequest2.setCompanyEmail("example@gmail.com");
         companyRequest2.setCompanyPhone(List.of("08022211150"));
-        companyRequest2.setCategory(Category.ECOMMERCE);
+        companyRequest2.setCategory("ECOMMERCE");
         companyRequest2.setBusinessRegistrationNumber("987654321");
-        companyResponse = companyService.createCompany(companyRequest2);
+        companyResponse = companyService.registerCompany(companyRequest2);
         String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("second registration: "+secondRegisteredCompanyPassword);
 
@@ -222,7 +255,7 @@ public class CompanyServiceImplTest {
 
     @Test
     public void testToFindCompanyByEmail(){
-        CompanyDetailsResponse companyDetailsResponse = companyServiceImpl.findCompanyByEmail(new CompanyDetailsRequest("ayodeleomodara1234@gmail.com"));
+        CompanyDetailsResponse companyDetailsResponse = companyService.findCompanyByEmail("ayodeleomodara1234@gmail.com");
         assertEquals("Unius".toLowerCase(), companyDetailsResponse.getCompanyName().toLowerCase());
         assertEquals("123456789", companyDetailsResponse.getBusinessRegistrationNumber());
         assertEquals("ayodeleomodara1234@gmail.com".toLowerCase(), companyDetailsResponse.getCompanyEmail().toLowerCase());
@@ -230,4 +263,42 @@ public class CompanyServiceImplTest {
         assertTrue(companyDetailsResponse.isActive());
     }
 
+    @Test
+    public void testThatCompanyCanOnlyRegisterOnce(){
+        RuntimeException exception  = assertThrows(RuntimeException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("Unius");
+            companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
+            companyRequest.setCompanyPhone(List.of("09012345678"));
+            companyRequest.setCategory("FINANCE");
+            companyRequest.setBusinessRegistrationNumber("123456789");
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals("An account with this information already exists. Please sign in to access your account.", exception.getMessage());
+        assertEquals(1, companyRepo.count());
+
+        RuntimeException exception2  = assertThrows(RuntimeException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("BlueBirds");
+            companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
+            companyRequest.setCompanyPhone(List.of("09012345678"));
+            companyRequest.setCategory("FINANCE");
+            companyRequest.setBusinessRegistrationNumber("123456789");
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals("An account with this information already exists. Please sign in to access your account.", exception2.getMessage());
+        assertEquals(1, companyRepo.count());
+
+        RuntimeException exception3  = assertThrows(RuntimeException.class, () -> {
+            CompanyRequest companyRequest = new CompanyRequest();
+            companyRequest.setCompanyName("Unius");
+            companyRequest.setCompanyEmail("jpmorgan@gmail.com");
+            companyRequest.setCompanyPhone(List.of("08134128960", "09132457819"));
+            companyRequest.setCategory("FINANCE");
+            companyRequest.setBusinessRegistrationNumber("123456789");
+            companyService.registerCompany(companyRequest);
+        });
+        assertEquals("An account with this information already exists. Please sign in to access your account.", exception3.getMessage());
+        assertEquals(1, companyRepo.count());
+    }
 }

@@ -15,7 +15,7 @@ public class CompanyRequest {
     private List<String> companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
-    private Category category;
+    private String category;
     private String companyApiKey;
     private String baseUrl;
 }

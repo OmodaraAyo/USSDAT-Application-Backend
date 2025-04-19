@@ -23,7 +23,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String companyEmail) throws UsernameNotFoundException {
         Company company = companyRepo.findByCompanyEmail(companyEmail);
         if (company == null) {
-            throw new UsernameNotFoundException("Company with account:" +companyEmail+" not found");
+            throw new UsernameNotFoundException("Company with account: " +companyEmail+" not found");
         }
         return new CompanyPrincipal(company);
     }

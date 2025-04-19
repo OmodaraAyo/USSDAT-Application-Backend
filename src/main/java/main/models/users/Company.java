@@ -19,13 +19,16 @@ public class Company {
     private String companyId;
     @Indexed(unique = true)
     private String ussdShortCode;
+    @Indexed(unique = true)
     private String companyName;
     private List<String> companyPhone;
+    @Indexed(unique = true)
     private String companyEmail;
     private String password;
     private String businessRegistrationNumber;
     private Category category;
     private String companyApiKey;
+    @Indexed(unique = true)
     private String apiKey;
     private String baseUrl;
     private boolean isActive;
