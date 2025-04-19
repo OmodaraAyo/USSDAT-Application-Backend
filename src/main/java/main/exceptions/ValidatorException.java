@@ -4,6 +4,8 @@ package main.exceptions;
 import main.dtos.signUp.CompanyRequest;
 import org.apache.commons.validator.routines.EmailValidator;
 
+import java.util.List;
+
 public class ValidatorException extends RuntimeException {
 
 //    private static final String VALID_EMAIL_PATTERN = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
@@ -34,13 +36,17 @@ public class ValidatorException extends RuntimeException {
         }
     }
 
-    public static void validatePhoneNumber(String phoneNumber) {
+    public static void validatePhoneNumber(List<String> phoneNumbers) {
 
-        if(phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.trim().isEmpty()){
-            throw new ValidatorException("Phone number is required");
-        }
-        if(!phoneNumber.matches(NIGERIA_PHONE_NUMBER_PATTERN)){
-            throw new ValidatorException("Invalid phone number. Please try again");
+        for(String phoneNumber : phoneNumbers){
+
+            if(phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.trim().isEmpty()){
+                throw new ValidatorException("Phone number is required");
+            }
+            if(!phoneNumber.matches(NIGERIA_PHONE_NUMBER_PATTERN)){
+                throw new ValidatorException("Invalid phone number. Please try again");
+            }
+
         }
     }
 

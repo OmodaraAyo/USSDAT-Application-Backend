@@ -1,13 +1,16 @@
 package main.service.implementations;
 
+import main.UssdAtApplication;
+import main.dtos.company.CompanyDetailsRequest;
+import main.dtos.company.CompanyDetailsResponse;
+import main.dtos.signIn.LoginRequest;
+import main.dtos.signIn.LoginResponse;
 import main.dtos.signUp.CompanyRequest;
 import main.dtos.signUp.CompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
-import main.models.users.Company;
 import main.models.utils.UssdCounter;
 import main.repository.CompanyRepo;
-import main.service.interfaces.CompanyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +19,15 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = UssdAtApplication.class)
+@ActiveProfiles("test")
 public class CompanyServiceImplTest {
-
-    @Autowired
-    private CompanyService companyService;
 
     @Autowired
     private CompanyRepo companyRepo;
@@ -31,7 +35,12 @@ public class CompanyServiceImplTest {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    @Autowired
+    private CompanyServiceImpl companyService;
+
     CompanyResponse companyResponse;
+    @Autowired
+    private CompanyServiceImpl companyServiceImpl;
 
     @BeforeEach
     public void startAllWithThis(){
@@ -43,7 +52,7 @@ public class CompanyServiceImplTest {
         CompanyRequest companyRequest = new CompanyRequest();
         companyRequest.setCompanyName("Unius");
         companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
-        companyRequest.setCompanyPhone("09012345678");
+        companyRequest.setCompanyPhone(List.of("09012345678"));
         companyRequest.setCategory(Category.FINANCE);
         companyRequest.setBusinessRegistrationNumber("123456789");
         companyResponse = companyService.createCompany(companyRequest);
@@ -105,7 +114,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("06123687901");
+            companyRequest.setCompanyPhone(List.of("06123687901"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception.getMessage());
@@ -115,7 +124,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("08083  352449");
+            companyRequest.setCompanyPhone(List.of("08083  352449"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception2.getMessage());
@@ -125,7 +134,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("08083  24  49");
+            companyRequest.setCompanyPhone(List.of("08083  24  49"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception3.getMessage());
@@ -135,7 +144,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("080835@@24_-");
+            companyRequest.setCompanyPhone(List.of("080835@@24_-"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception4.getMessage());
@@ -145,7 +154,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("0+0835++24_-");
+            companyRequest.setCompanyPhone(List.of("0+0835++24_-"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception5.getMessage());
@@ -155,7 +164,7 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("+80835352449");
+            companyRequest.setCompanyPhone(List.of("+80835352449"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception6.getMessage());
@@ -165,11 +174,60 @@ public class CompanyServiceImplTest {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
             companyRequest.setCompanyEmail("unius2024@gmail.com");
-            companyRequest.setCompanyPhone("+23480");
+            companyRequest.setCompanyPhone(List.of("+23480"));
             companyService.createCompany(companyRequest);
         });
         assertEquals( "Invalid phone number. Please try again", exception7.getMessage());
         assertEquals(1, companyRepo.count());
+    }
+
+    @Test
+    public void testThatRegisteredCompanyCanSignInWithGeneratedPassword(){
+        String firstRegisteredCompanyPassword = CompanyServiceImpl.genPass;
+        System.out.println("first registration: "+firstRegisteredCompanyPassword);
+
+        LoginResponse loginResponse= companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", firstRegisteredCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        CompanyRequest companyRequest2 = new CompanyRequest();
+        companyRequest2.setCompanyName("Sui");
+        companyRequest2.setCompanyEmail("example@gmail.com");
+        companyRequest2.setCompanyPhone(List.of("08022211150"));
+        companyRequest2.setCategory(Category.ECOMMERCE);
+        companyRequest2.setBusinessRegistrationNumber("987654321");
+        companyResponse = companyService.createCompany(companyRequest2);
+        String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
+        System.out.println("second registration: "+secondRegisteredCompanyPassword);
+
+        LoginResponse loginResponse2 = companyService.signIn(new LoginRequest("example@gmail.com", secondRegisteredCompanyPassword));
+        assertTrue(loginResponse2.getIsLoggedIn());
+
+    }
+
+    @Test
+    public void testThatCompanyCanNotSignInWithIncorrectCredentials(){
+        String password = CompanyServiceImpl.genPass;
+        System.out.println("Password from new test: "+password);
+
+        ValidatorException exception = assertThrows(ValidatorException.class, () -> {
+            companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", "123456789"));
+        });
+        assertEquals("Bad credentials: Invalid email or password", exception.getMessage());
+
+        ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
+            companyService.signIn(new LoginRequest("test@gmail.com", password));
+        });
+        assertEquals("Bad credentials: Invalid email or password", exception2.getMessage());
+    }
+
+    @Test
+    public void testToFindCompanyByEmail(){
+        CompanyDetailsResponse companyDetailsResponse = companyServiceImpl.findCompanyByEmail(new CompanyDetailsRequest("ayodeleomodara1234@gmail.com"));
+        assertEquals("Unius".toLowerCase(), companyDetailsResponse.getCompanyName().toLowerCase());
+        assertEquals("123456789", companyDetailsResponse.getBusinessRegistrationNumber());
+        assertEquals("ayodeleomodara1234@gmail.com".toLowerCase(), companyDetailsResponse.getCompanyEmail().toLowerCase());
+        assertSame(companyDetailsResponse.getCategory(), Category.FINANCE);
+        assertTrue(companyDetailsResponse.isActive());
     }
 
 }
