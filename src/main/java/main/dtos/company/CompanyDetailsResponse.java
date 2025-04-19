@@ -1,28 +1,23 @@
-package main.models.users;
+package main.dtos.company;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import main.models.enums.Category;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
 
-@Document(collection = "Companies")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
-public class Company {
-    @Id
+public class CompanyDetailsResponse {
     private String companyId;
-    @Indexed(unique = true)
     private String ussdShortCode;
     private String companyName;
     private List<String> companyPhone;
     private String companyEmail;
-    private String password;
     private String businessRegistrationNumber;
     private Category category;
     private String companyApiKey;
