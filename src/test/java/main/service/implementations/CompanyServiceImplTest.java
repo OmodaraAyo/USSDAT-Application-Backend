@@ -57,13 +57,13 @@ public class CompanyServiceImplTest {
 
 
     @Test
-    public void testToCreateANewCompany() {
+    public void shouldCreateNewCompany() {
         assertTrue(companyResponse.isSuccess());
         assertEquals(1, companyRepo.count());
     }
 
     @Test
-    public void testInvalidCompanyNameWithSpecialCharacters(){
+    public void shouldRejectCompanyName_withSpecialCharacters(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius@1");
@@ -83,7 +83,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testEmailValidationFailsForInvalidPattern(){
+    public void shouldFailValidation_forInvalidEmail(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
 
             CompanyRequest companyRequest = new CompanyRequest();
@@ -106,7 +106,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testPhoneNumberValidationFailsForInvalidNigeriaPhoneNumberPattern(){
+    public void shouldFailValidation_forInvalidNigerianPhoneNumber(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
@@ -189,7 +189,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testCategoryValidationFailsForInvalidCategory(){
+    public void shouldFailValidation_forInvalidCategory(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
@@ -215,7 +215,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testThatRegisteredCompanyCanSignInWithGeneratedPassword(){
+    public void shouldSignInWithGeneratedPassword_afterCompanyRegistration(){
         String firstRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("first registration: "+firstRegisteredCompanyPassword);
 
@@ -238,7 +238,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testThatCompanyCanNotSignInWithIncorrectCredentials(){
+    public void shouldNotSignInWithIncorrectCredentials(){
         String password = CompanyServiceImpl.genPass;
         System.out.println("Password from new test: "+password);
 
@@ -254,7 +254,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testToFindCompanyByEmail(){
+    public void shouldFindCompanyByEmail(){
         CompanyDetailsResponse companyDetailsResponse = companyService.findCompanyByEmail("ayodeleomodara1234@gmail.com");
         assertEquals("Unius".toLowerCase(), companyDetailsResponse.getCompanyName().toLowerCase());
         assertEquals("123456789", companyDetailsResponse.getBusinessRegistrationNumber());
@@ -264,7 +264,7 @@ public class CompanyServiceImplTest {
     }
 
     @Test
-    public void testThatCompanyCanOnlyRegisterOnce(){
+    public void shouldAllowCompanyToRegisterOnlyOnce(){
         RuntimeException exception  = assertThrows(RuntimeException.class, () -> {
             CompanyRequest companyRequest = new CompanyRequest();
             companyRequest.setCompanyName("Unius");
@@ -300,5 +300,10 @@ public class CompanyServiceImplTest {
         });
         assertEquals("An account with this information already exists. Please sign in to access your account.", exception3.getMessage());
         assertEquals(1, companyRepo.count());
+    }
+
+    @Test
+    public void shouldAllowCompanyToUpdateInformation_whenAuthenticated(){
+
     }
 }
