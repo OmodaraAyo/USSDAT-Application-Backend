@@ -1,6 +1,8 @@
 package main.service.interfaces;
 
+import main.models.users.Company;
+
 public interface EmailService {
 
-    void sendEmail(String to, String subject, String body);
+    void sendEmail(String registeredCompanyEmail, String generatedPassword);
 }
