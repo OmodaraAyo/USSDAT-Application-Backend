@@ -42,7 +42,7 @@ public class CompanyServiceImplTest {
 
         CompanyRequest companyRequest = new CompanyRequest();
         companyRequest.setCompanyName("Unius");
-        companyRequest.setCompanyEmail("unius2024@gmail.com");
+        companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
         companyRequest.setCompanyPhone("09012345678");
         companyRequest.setCategory(Category.FINANCE);
         companyRequest.setBusinessRegistrationNumber("123456789");
