@@ -3,6 +3,8 @@ package main.dtos.signUp;
 import lombok.*;
 import main.models.enums.Category;
 
+import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -10,7 +12,7 @@ import main.models.enums.Category;
 @ToString
 public class CompanyRequest {
     private String companyName;
-    private String companyPhone;
+    private List<String> companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
     private Category category;

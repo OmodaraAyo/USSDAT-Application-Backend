@@ -2,9 +2,7 @@ package main.service.implementations;
 
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import main.models.users.Company;
 import main.service.interfaces.EmailService;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -23,7 +21,6 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(String registeredCompanyEmail, String generatedPassword) {
         try{
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-
             mimeMessage.setFrom(new InternetAddress("backwyth@gmail.com"));
             mimeMessage.setRecipients(MimeMessage.RecipientType.TO, registeredCompanyEmail);
             mimeMessage.setSubject("Welcome to Backwyth - Your USSD Gateway Starts Here");
@@ -62,4 +59,14 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException(e);
         }
     }
+
 }
+
+
+//    private final Environment environment;
+//            for(String profile : environment.getActiveProfiles()){
+//                if(profile.equalsIgnoreCase("test")){
+//                    System.out.println("TEST PROFILE- Email not sent");
+//                    return;
+//                }
+//            }
