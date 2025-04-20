@@ -2,6 +2,7 @@ package main.service.implementations;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
+import main.dtos.DeleteResponse;
 import main.dtos.company.CompanyDetailsResponse;
 import main.dtos.signIn.LoginRequest;
 import main.dtos.signIn.LoginResponse;
@@ -65,12 +66,24 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public LoginResponse signIn(LoginRequest loginRequest) {
         String requestEmail = loginRequest.getCompanyEmail().toLowerCase();
+        checkIfUserIsActive(requestEmail);
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestEmail, loginRequest.getPassword()));
             updateCompanyState(requestEmail);
             return confirmedLoginResponse(loginRequest);
         }catch (BadCredentialsException e) {
             throw new ValidatorException("Bad credentials: Invalid email or password");
+        }
+    }
+
+    private void checkIfUserIsActive(String requestEmail) {
+        Optional<Company> company = Optional.ofNullable(getCompanyByEmail(requestEmail));
+        company.ifPresent(this::checkActiveState);
+    }
+
+    private void checkActiveState(Company company) {
+        if(!company.isActive()){
+            throw new RuntimeException("Account is deactivated. Please contact support.");
         }
     }
 
@@ -126,6 +139,18 @@ public class CompanyServiceImpl implements CompanyService {
         currentLoggedInCompany.setLoggedIn(false);
         companyRepo.save(currentLoggedInCompany);
         return new LogoutResponse("Logout successful");
+    }
+
+    @Override
+    public DeleteResponse deleteById() {
+        Company deleteCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+
+        deleteCompany.setActive(false);
+        deleteCompany.setLoggedIn(false);
+        deleteCompany.setUpdateAt(DateUtil.getCurrentDate());
+        deleteCompany.setLastLoginDate(DateUtil.getCurrentDate());
+        companyRepo.save(deleteCompany);
+        return new DeleteResponse("Account closed successfully", true);
     }
 
     private void updateCompanyState(String requestEmail) {

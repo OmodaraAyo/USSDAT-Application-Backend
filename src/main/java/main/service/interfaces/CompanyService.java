@@ -1,5 +1,6 @@
 package main.service.interfaces;
 
+import main.dtos.DeleteResponse;
 import main.dtos.company.CompanyDetailsResponse;
 import main.dtos.signIn.LoginRequest;
 import main.dtos.signIn.LoginResponse;
@@ -20,4 +21,5 @@ public interface CompanyService {
     UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest);
     ChangePasswordResponse resetPassword(ChangePasswordRequest request);
     LogoutResponse logOut();
+    DeleteResponse deleteById();
 }

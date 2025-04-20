@@ -1,6 +1,7 @@
 package main.service.implementations;
 
 import main.UssdAtApplication;
+import main.dtos.DeleteResponse;
 import main.dtos.company.CompanyDetailsRequest;
 import main.dtos.company.CompanyDetailsResponse;
 import main.dtos.signIn.LoginRequest;
@@ -385,4 +386,38 @@ public class CompanyServiceImplTest {
 
     }
 
+    @Test
+    public void shouldAllowCompanyToDeleteItsAccountIfAuthenticated(){
+        assertFalse(companyResponse.isIsLoggedIn());
+        String registeredCompanyPassword1 = CompanyServiceImpl.genPass;
+        Company company = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+
+        assertFalse(company.isLoggedIn());
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshCompany = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany.isLoggedIn());
+
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        assertEquals("Password changed successfully", request.getMessage());
+        assertTrue(refreshCompany.isLoggedIn());
+
+        DeleteResponse response = companyService.deleteById();
+        assertEquals("Account closed successfully", response.getMessage());
+        assertTrue(response.isSuccess());
+
+        Company refreshCompany2 = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(refreshCompany2.isLoggedIn());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            LoginResponse loginResponse2 = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
+        });
+
+        assertEquals("Account is deactivated. Please contact support.", exception.getMessage());
+    }
 }
