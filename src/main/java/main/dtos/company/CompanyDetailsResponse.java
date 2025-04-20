@@ -24,6 +24,8 @@ public class CompanyDetailsResponse {
     private String apiKey;
     private String baseUrl;
     private boolean isActive;
+    private boolean isLoggedIn;
+    private String role;
     private boolean isFirstLogin;
     private String lastLoginDate;
     private String createAt;

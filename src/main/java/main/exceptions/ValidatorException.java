@@ -2,6 +2,7 @@ package main.exceptions;
 
 
 import main.dtos.signUp.CompanyRequest;
+import main.dtos.update.UpdateCompanyRequest;
 import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
 
@@ -65,5 +66,20 @@ public class ValidatorException extends RuntimeException {
 
     public static void validateSelectedCategory(String selectedCategory){
         Category.getCategory(selectedCategory);
+    }
+
+    public static void validateUpdateRequestDetails(UpdateCompanyRequest request){
+        if(request.getCompanyRequest().getCompanyPhone() == null || request.getCompanyRequest().getCompanyPhone().isEmpty()) {
+            throw new ValidatorException("At least one phone number is required");
+        }
+        if(request.getCompanyRequest().getCategory() == null || request.getCompanyRequest().getCategory().trim().isEmpty()) {
+            throw new ValidatorException("Category is required");
+        }
+        if(request.getCompanyRequest().getCompanyApiKey() == null || request.getCompanyRequest().getCompanyApiKey().trim().isEmpty()) {
+            throw new ValidatorException("Api key is required");
+        }
+        if(request.getCompanyRequest().getBaseUrl() == null || request.getCompanyRequest().getBaseUrl().trim().isEmpty()) {
+            throw new ValidatorException("Base url is required");
+        }
     }
 }

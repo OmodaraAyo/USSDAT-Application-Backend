@@ -2,6 +2,7 @@ package main.models.users;
 
 import lombok.*;
 import main.models.enums.Category;
+import main.models.enums.Role;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -31,8 +32,10 @@ public class Company {
     @Indexed(unique = true)
     private String apiKey;
     private String baseUrl;
+    private Role role;
     private boolean isActive;
     private boolean isFirstLogin;
+    private boolean isLoggedIn;
     private String lastLoginDate;
     private String createAt;
     private String updateAt;
