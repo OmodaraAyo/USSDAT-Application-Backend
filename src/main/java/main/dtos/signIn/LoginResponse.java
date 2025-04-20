@@ -18,4 +18,5 @@ public class LoginResponse {
     private String token;
     private String response;
     private Boolean isLoggedIn;
+    private boolean isFirstLogin;
 }
