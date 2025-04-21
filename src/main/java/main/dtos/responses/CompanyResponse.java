@@ -1,4 +1,4 @@
-package main.dtos.signUp;
+package main.dtos.responses;
 
 import lombok.*;
 

@@ -1,4 +1,4 @@
-package main.dtos.update;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ChangePasswordRequest {
-    private String oldPassword;
-    private String newPassword;
+public class LogoutResponse {
+    private String message;
 }

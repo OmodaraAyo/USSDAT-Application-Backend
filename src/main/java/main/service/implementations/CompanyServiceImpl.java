@@ -2,22 +2,22 @@ package main.service.implementations;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
-import main.dtos.DeleteResponse;
-import main.dtos.company.CompanyDetailsResponse;
-import main.dtos.signIn.LoginRequest;
-import main.dtos.signIn.LoginResponse;
-import main.dtos.signOut.LogoutResponse;
-import main.dtos.signUp.CompanyRequest;
-import main.dtos.signUp.CompanyResponse;
-import main.dtos.update.ChangePasswordRequest;
-import main.dtos.update.ChangePasswordResponse;
-import main.dtos.update.UpdateCompanyRequest;
-import main.dtos.update.UpdateCompanyResponse;
+import main.dtos.responses.DeleteResponse;
+import main.dtos.responses.CompanyDetailsResponse;
+import main.dtos.requests.LoginRequest;
+import main.dtos.responses.LoginResponse;
+import main.dtos.responses.LogoutResponse;
+import main.dtos.requests.CompanyRequest;
+import main.dtos.responses.CompanyResponse;
+import main.dtos.requests.ChangePasswordRequest;
+import main.dtos.responses.ChangePasswordResponse;
+import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.enums.Role;
 import main.models.users.Company;
-import main.repository.CompanyRepo;
+import main.repositories.CompanyRepo;
 import main.service.interfaces.CompanyService;
 import main.utils.DateUtil;
 import main.utils.GeneratorUtil;
@@ -25,10 +25,12 @@ import main.utils.UssdCounterUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,27 +68,16 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public LoginResponse signIn(LoginRequest loginRequest) {
         String requestEmail = loginRequest.getCompanyEmail().toLowerCase();
-        checkIfUserIsActive(requestEmail);
         try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(requestEmail, loginRequest.getPassword()));
             updateCompanyState(requestEmail);
             return confirmedLoginResponse(loginRequest);
-        }catch (BadCredentialsException e) {
+        } catch(DisabledException e){
+            throw new ValidatorException("Account is deactivated. Please contact support.");
+        } catch (BadCredentialsException e) {
             throw new ValidatorException("Bad credentials: Invalid email or password");
         }
     }
-
-    private void checkIfUserIsActive(String requestEmail) {
-        Optional<Company> company = Optional.ofNullable(getCompanyByEmail(requestEmail));
-        company.ifPresent(this::checkActiveState);
-    }
-
-    private void checkActiveState(Company company) {
-        if(!company.isActive()){
-            throw new RuntimeException("Account is deactivated. Please contact support.");
-        }
-    }
-
 
     @Override
     public CompanyDetailsResponse findCompanyById(String id) {
@@ -115,7 +106,6 @@ public class CompanyServiceImpl implements CompanyService {
 //        company.setCategory(Category.valueOf(updateRequest.getCompanyRequest().getCategory()));
         company.setCompanyApiKey(updateRequest.getCompanyRequest().getCompanyApiKey());
         company.setBaseUrl(updateRequest.getCompanyRequest().getBaseUrl());
-//        company.setFirstLogin(updateRequest.isFirstLogin());
         company.setLastLoginDate(updateRequest.getLastLoginDate());
         company.setUpdateAt(DateUtil.getCurrentDate());
 
@@ -151,6 +141,37 @@ public class CompanyServiceImpl implements CompanyService {
         deleteCompany.setLastLoginDate(DateUtil.getCurrentDate());
         companyRepo.save(deleteCompany);
         return new DeleteResponse("Account closed successfully", true);
+    }
+
+    @Override
+    public List<Company> getAllCompanies() {
+        return companyRepo.findAll();
+    }
+
+    @Override
+    public DeleteResponse deleteAllCompanies() {
+        companyRepo.deleteAll();
+        return new DeleteResponse("Deleted all companies", true);
+    }
+
+    @Override
+    public Company getCompanyById(String id) {
+        return findById(id);
+    }
+
+    @Override
+    public DeleteResponse deleteCompanyById(String id) {
+        Optional<Company> deleteCompany = Optional.ofNullable(findById(id));
+        if (deleteCompany.isPresent()) {
+            companyRepo.delete(deleteCompany.get());
+            return new DeleteResponse("Deleted successfully", true);
+        }
+        return null;
+    }
+
+    @Override
+    public Company saveCompany(Company company) {
+        return companyRepo.save(company);
     }
 
     private void updateCompanyState(String requestEmail) {
@@ -243,9 +264,26 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private LoginResponse createLoginResponse(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
+        if(getCurrentLoggedInCompany.isFirstLogin()){
+            return createFirstLoginResponseWithWarning(loginRequest, getCurrentLoggedInCompany);
+        }
+        return createLoginResponseWithoutWarning(loginRequest, getCurrentLoggedInCompany);
+    }
+
+    private LoginResponse createLoginResponseWithoutWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
         loginResponse.setResponse("Login Successful");
+        loginResponse.setIsLoggedIn(true);
+        loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());
+        return loginResponse;
+    }
+
+    private LoginResponse createFirstLoginResponseWithWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setResponse("Login Successful");
+        loginResponse.setWarning("Your default password is temporary and expires after first use. Please set a new password.");
         loginResponse.setIsLoggedIn(true);
         loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());
         return loginResponse;
@@ -262,7 +300,7 @@ public class CompanyServiceImpl implements CompanyService {
     private CompanyResponse registerNewCompany(CompanyRequest companyRequest) {
         String generatedPassword = generatePassword();
         Company newCompany = createNewCompany(companyRequest, generatedPassword);
-        Company savedCompany = saveCompany(newCompany);
+        Company savedCompany = saveNewCompany(newCompany);
 //        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
         return new CompanyResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
     }
@@ -291,7 +329,7 @@ public class CompanyServiceImpl implements CompanyService {
         return genPass;
     }
 
-    private Company saveCompany(Company newCompany) {
+    private Company saveNewCompany(Company newCompany) {
         try{
             return companyRepo.save(newCompany);
         } catch (DuplicateKeyException | MongoWriteException e) {

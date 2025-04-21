@@ -1,17 +1,14 @@
-package main.dtos.update;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import main.dtos.company.CompanyDetailsResponse;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class UpdateCompanyResponse {
+public class ChangePasswordResponse {
     private String message;
-    private CompanyDetailsResponse companyDetails = new CompanyDetailsResponse();
 }
-

@@ -1,14 +1,9 @@
-package main.dtos.signIn;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import main.models.enums.Category;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +12,7 @@ import java.util.List;
 public class LoginResponse {
     private String token;
     private String response;
+    private String warning;
     private Boolean isLoggedIn;
     private boolean isFirstLogin;
 }

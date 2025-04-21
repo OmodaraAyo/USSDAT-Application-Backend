@@ -1,4 +1,4 @@
-package main.dtos.update;
+package main.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class ChangePasswordResponse {
-    private String message;
+@Getter
+public class MenuRequest {
+    private String title;
 }

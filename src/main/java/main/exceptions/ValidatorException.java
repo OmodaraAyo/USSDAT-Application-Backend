@@ -1,8 +1,8 @@
 package main.exceptions;
 
 
-import main.dtos.signUp.CompanyRequest;
-import main.dtos.update.UpdateCompanyRequest;
+import main.dtos.requests.CompanyRequest;
+import main.dtos.requests.UpdateCompanyRequest;
 import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
 

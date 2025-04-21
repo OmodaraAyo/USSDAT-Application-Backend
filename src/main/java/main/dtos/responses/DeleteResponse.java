@@ -1,4 +1,4 @@
-package main.dtos;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
