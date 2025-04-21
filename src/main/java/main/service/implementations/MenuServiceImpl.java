@@ -37,7 +37,7 @@ public class MenuServiceImpl implements MenuService {
 
             companyService.saveCompany(company.get());
             return new MenuResponse(savedMenu.getId(), "Awesome! Your menu is now live.");
-//        }
+        }
         throw new RuntimeException("Company not found");
     }
 }
