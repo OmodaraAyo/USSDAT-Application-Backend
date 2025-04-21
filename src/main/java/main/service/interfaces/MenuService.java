@@ -5,5 +5,5 @@ import main.dtos.responses.MenuResponse;
 
 public interface MenuService {
 
-    MenuResponse addNewMenu(String id, MenuRequest request);
+    MenuResponse addNewMenu(MenuRequest request);
 }

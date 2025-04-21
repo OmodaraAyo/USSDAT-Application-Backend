@@ -363,7 +363,7 @@ public class CompanyServiceImplTest {
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
             companyService.resetPassword(new ChangePasswordRequest("wagwan1234", "Ayodele01$"));
         });
-        assertEquals("Authentication required", exception.getMessage());
+        assertEquals("Authentication required.", exception.getMessage());
     }
 
     @Test

@@ -20,7 +20,7 @@ public class AuthenticatedCompanyService {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if(authentication == null || !authentication.isAuthenticated()) {
-                throw new AuthenticationServiceException("Authentication required");
+                throw new AuthenticationServiceException("Authentication required.");
             }
 
             Object principal = authentication.getPrincipal();

@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MenuResponse {
+    private String companyId;
     private String id;
     private String response;
 }
