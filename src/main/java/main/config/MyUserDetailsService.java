@@ -2,7 +2,7 @@ package main.config;
 
 import main.models.users.Company;
 import main.models.security.CompanyPrincipal;
-import main.repository.CompanyRepo;
+import main.repositories.CompanyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

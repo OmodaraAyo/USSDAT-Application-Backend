@@ -1,4 +1,4 @@
-package main.repository;
+package main.repositories;
 
 import main.models.users.Company;
 import org.springframework.data.mongodb.repository.MongoRepository;

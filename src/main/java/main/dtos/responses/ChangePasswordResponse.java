@@ -1,14 +1,14 @@
-package main.dtos.company;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-public class CompanyDetailsRequest {
-    private String email;
+public class ChangePasswordResponse {
+    private String message;
 }
