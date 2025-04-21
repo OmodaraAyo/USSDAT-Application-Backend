@@ -25,18 +25,18 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public MenuResponse addNewMenu(String id, MenuRequest request) {
-//        Optional<Company> company = Optional.ofNullable(companyService.getCompanyById(id));
-//
-//        if (company.isPresent()) {
-//            Menu menu = new Menu();
-//            menu.setTitle(request.getTitle());
-//            menu.setCreatedAt(DateUtil.getCurrentDate());
-//            menu.setUpdatedAt(DateUtil.getCurrentDate());
-//            Menu savedMenu = menuRepo.save(menu);
-//            company.get().getDefaultMenus().add(savedMenu);
-//
-//            companyService.saveCompany(company.get());
-//            return new MenuResponse(savedMenu.getId(), "Awesome! Your menu is now live.");
+        Optional<Company> company = Optional.ofNullable(companyService.getCompanyById(id));
+
+        if (company.isPresent()) {
+            Menu menu = new Menu();
+            menu.setTitle(request.getTitle());
+            menu.setCreatedAt(DateUtil.getCurrentDate());
+            menu.setUpdatedAt(DateUtil.getCurrentDate());
+            Menu savedMenu = menuRepo.save(menu);
+            company.get().getDefaultMenus().add(savedMenu);
+
+            companyService.saveCompany(company.get());
+            return new MenuResponse(savedMenu.getId(), "Awesome! Your menu is now live.");
 //        }
         throw new RuntimeException("Company not found");
     }
