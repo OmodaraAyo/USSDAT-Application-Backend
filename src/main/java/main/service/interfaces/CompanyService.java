@@ -27,7 +27,8 @@ public interface CompanyService {
     DeleteResponse deleteById();
     List<Company> getAllCompanies();
     DeleteResponse deleteAllCompanies();
-    Company getCompanyById(String id);
-    DeleteResponse deleteCompanyById(String id);
+    Company getByCompanyId(String id);
+    DeleteResponse deleteByCompanyId(String id);
     Company saveCompany(Company company);
+    Company getByCompanyEmail(String email);
 }

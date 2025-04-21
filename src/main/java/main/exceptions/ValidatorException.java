@@ -2,6 +2,7 @@ package main.exceptions;
 
 
 import main.dtos.requests.CompanyRequest;
+import main.dtos.requests.MenuRequest;
 import main.dtos.requests.UpdateCompanyRequest;
 import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -80,6 +81,13 @@ public class ValidatorException extends RuntimeException {
         }
         if(request.getCompanyRequest().getBaseUrl() == null || request.getCompanyRequest().getBaseUrl().trim().isEmpty()) {
             throw new ValidatorException("Base url is required");
+        }
+    }
+
+
+    public static void validateMenuRequest(MenuRequest request) {
+        if(request.getTitle() == null || request.getTitle().trim().isEmpty()){
+            throw new ValidatorException("Title cannot be empty");
         }
     }
 }

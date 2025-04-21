@@ -90,7 +90,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public CompanyDetailsResponse findCompanyByEmail(String companyEmail) {
-        Optional<Company> foundCompany = Optional.ofNullable(getCompanyByEmail(companyEmail));
+        Optional<Company> foundCompany = Optional.ofNullable(fetchCompanyByEmail(companyEmail));
         if (foundCompany.isPresent()) {
             return companyDetails(foundCompany.get());
         }
@@ -155,12 +155,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Company getCompanyById(String id) {
+    public Company getByCompanyId(String id) {
         return findById(id);
     }
 
     @Override
-    public DeleteResponse deleteCompanyById(String id) {
+    public DeleteResponse deleteByCompanyId(String id) {
         Optional<Company> deleteCompany = Optional.ofNullable(findById(id));
         if (deleteCompany.isPresent()) {
             companyRepo.delete(deleteCompany.get());
@@ -174,8 +174,13 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepo.save(company);
     }
 
+    @Override
+    public Company getByCompanyEmail(String email) {
+        return companyRepo.findByCompanyEmail(email);
+    }
+
     private void updateCompanyState(String requestEmail) {
-        Company company = getCompanyByEmail(requestEmail);
+        Company company = fetchCompanyByEmail(requestEmail);
         company.setLoggedIn(true);
         company.setLastLoginDate(DateUtil.getCurrentDate());
         companyRepo.save(company);
@@ -223,7 +228,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private void checkByCompanyEmail(String companyEmail) {
-        Optional<Company> existing = Optional.ofNullable(getCompanyByEmail(companyEmail));
+        Optional<Company> existing = Optional.ofNullable(fetchCompanyByEmail(companyEmail));
         if (existing.isPresent()) {
             throw new RuntimeException("An account with this information already exists. Please sign in to access your account.");
         }
@@ -293,7 +298,7 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepo.findById(id).orElseThrow(() -> new RuntimeException("Company not found"));
     }
 
-    private Company getCompanyByEmail(String companyEmail) {
+    private Company fetchCompanyByEmail(String companyEmail) {
         return companyRepo.findByCompanyEmail(companyEmail.toLowerCase());
     }
 
