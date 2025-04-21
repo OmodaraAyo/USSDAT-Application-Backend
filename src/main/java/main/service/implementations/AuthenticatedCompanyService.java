@@ -1,7 +1,7 @@
 package main.service.implementations;
 
 import main.models.users.Company;
-import main.repository.CompanyRepo;
+import main.repositories.CompanyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;

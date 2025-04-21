@@ -1,4 +1,4 @@
-package main.dtos.company;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

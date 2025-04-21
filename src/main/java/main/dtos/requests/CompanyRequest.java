@@ -1,7 +1,6 @@
-package main.dtos.signUp;
+package main.dtos.requests;
 
 import lombok.*;
-import main.models.enums.Category;
 
 import java.util.List;
 

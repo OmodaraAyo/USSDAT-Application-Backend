@@ -1,12 +1,9 @@
-package main.dtos.update;
+package main.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import main.dtos.signUp.CompanyRequest;
-
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +11,6 @@ import java.util.List;
 @Setter
 public class UpdateCompanyRequest {
     private CompanyRequest companyRequest = new CompanyRequest();
-//    private boolean isFirstLogin;
     private String lastLoginDate;
     private String updatedAt;
 }

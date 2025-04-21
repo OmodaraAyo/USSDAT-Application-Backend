@@ -1,24 +1,24 @@
 package main.service.implementations;
 
 import main.UssdAtApplication;
-import main.dtos.DeleteResponse;
-import main.dtos.company.CompanyDetailsRequest;
-import main.dtos.company.CompanyDetailsResponse;
-import main.dtos.signIn.LoginRequest;
-import main.dtos.signIn.LoginResponse;
-import main.dtos.signOut.LogoutResponse;
-import main.dtos.signUp.CompanyRequest;
-import main.dtos.signUp.CompanyResponse;
-import main.dtos.update.ChangePasswordRequest;
-import main.dtos.update.ChangePasswordResponse;
-import main.dtos.update.UpdateCompanyRequest;
-import main.dtos.update.UpdateCompanyResponse;
+import main.dtos.responses.DeleteResponse;
+import main.dtos.responses.CompanyDetailsResponse;
+import main.dtos.requests.LoginRequest;
+import main.dtos.responses.LoginResponse;
+import main.dtos.responses.LogoutResponse;
+import main.dtos.requests.CompanyRequest;
+import main.dtos.responses.CompanyResponse;
+import main.dtos.requests.ChangePasswordRequest;
+import main.dtos.responses.ChangePasswordResponse;
+import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.security.CompanyPrincipal;
 import main.models.users.Company;
 import main.models.utils.UssdCounter;
-import main.repository.CompanyRepo;
+import main.repositories.CompanyRepo;
+import main.service.interfaces.CompanyService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +47,9 @@ public class CompanyServiceImplTest {
     private MongoTemplate mongoTemplate;
 
     @Autowired
-    private CompanyServiceImpl companyService;
+    private CompanyService companyService;
 
-    CompanyResponse companyResponse;
+    private CompanyResponse companyResponse;
 
     @BeforeEach
     public void startAllWithThis(){
@@ -391,8 +391,8 @@ public class CompanyServiceImplTest {
         assertFalse(companyResponse.isIsLoggedIn());
         String registeredCompanyPassword1 = CompanyServiceImpl.genPass;
         Company company = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
-
         assertFalse(company.isLoggedIn());
+
         LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
         assertTrue(loginResponse.getIsLoggedIn());
 
@@ -415,9 +415,33 @@ public class CompanyServiceImplTest {
         assertFalse(refreshCompany2.isLoggedIn());
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            LoginResponse loginResponse2 = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
+            companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
         });
 
         assertEquals("Account is deactivated. Please contact support.", exception.getMessage());
+    }
+
+    @Test
+    public void shouldAllowCompanyToCreateDefaultMenuIfAuthenticated(){
+        String registeredCompanyPassword1 = CompanyServiceImpl.genPass;
+        Company company = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshCompany = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany.isLoggedIn());
+
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        assertEquals("Password changed successfully", request.getMessage());
+        assertTrue(refreshCompany.isLoggedIn());
+
+//        companyService.addMenu(new MenuRequest("register"));
+
     }
 }

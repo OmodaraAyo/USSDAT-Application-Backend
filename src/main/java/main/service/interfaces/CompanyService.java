@@ -1,16 +1,19 @@
 package main.service.interfaces;
 
-import main.dtos.DeleteResponse;
-import main.dtos.company.CompanyDetailsResponse;
-import main.dtos.signIn.LoginRequest;
-import main.dtos.signIn.LoginResponse;
-import main.dtos.signOut.LogoutResponse;
-import main.dtos.signUp.CompanyRequest;
-import main.dtos.signUp.CompanyResponse;
-import main.dtos.update.ChangePasswordRequest;
-import main.dtos.update.ChangePasswordResponse;
-import main.dtos.update.UpdateCompanyRequest;
-import main.dtos.update.UpdateCompanyResponse;
+import main.dtos.responses.DeleteResponse;
+import main.dtos.responses.CompanyDetailsResponse;
+import main.dtos.requests.LoginRequest;
+import main.dtos.responses.LoginResponse;
+import main.dtos.responses.LogoutResponse;
+import main.dtos.requests.CompanyRequest;
+import main.dtos.responses.CompanyResponse;
+import main.dtos.requests.ChangePasswordRequest;
+import main.dtos.responses.ChangePasswordResponse;
+import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.responses.UpdateCompanyResponse;
+import main.models.users.Company;
+
+import java.util.List;
 
 public interface CompanyService {
 
@@ -22,4 +25,9 @@ public interface CompanyService {
     ChangePasswordResponse resetPassword(ChangePasswordRequest request);
     LogoutResponse logOut();
     DeleteResponse deleteById();
+    List<Company> getAllCompanies();
+    DeleteResponse deleteAllCompanies();
+    Company getCompanyById(String id);
+    DeleteResponse deleteCompanyById(String id);
+    Company saveCompany(Company company);
 }
