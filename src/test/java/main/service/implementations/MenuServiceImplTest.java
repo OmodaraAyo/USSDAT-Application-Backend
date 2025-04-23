@@ -3,9 +3,13 @@ package main.service.implementations;
 import main.dtos.requests.CompanyRequest;
 import main.dtos.requests.LoginRequest;
 import main.dtos.requests.MenuRequest;
+import main.dtos.requests.MenuTitleRequest;
 import main.dtos.responses.CompanyResponse;
 import main.dtos.responses.LoginResponse;
 import main.dtos.responses.MenuResponse;
+import main.dtos.responses.MenuTitleResponse;
+import main.exceptions.EmptyItemException;
+import main.exceptions.MenuNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.security.CompanyPrincipal;
 import main.models.users.Company;
@@ -64,7 +68,7 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldNotAddNewMenuWhenCompanyIsAuthenticated(){
+    public void shouldNotAddNewMenuWhenCompanyIsNotAuthenticated(){
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
             menuService.addNewMenu(new MenuRequest("register"));
         });
@@ -187,5 +191,97 @@ public class MenuServiceImplTest {
 
         assertEquals("Oops! A menu titled 'Register' already exists. Please try another name.", exception.getMessage());
 
+    }
+
+    @Test
+    public void givenCurrentUserHasMenus_whenFindingByTitle_thenReturnMatchingMenu(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+
+        //add first menu for company 1
+        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        MenuResponse savedMenu2 = menuService.addNewMenu(new MenuRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        //add first menu for company 3
+        MenuResponse savedMenu3 = menuService.addNewMenu(new MenuRequest("Transfer"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu3.getResponse());
+
+        MenuTitleResponse response = menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        assertTrue(response.isSuccess());
+        assertEquals("Transfer", response.getTitle());
+    }
+
+    @Test
+    public void givenCurrentUserHasNoMenus_whenFindingByTitle_thenThrowEmptyItemException(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+
+        EmptyItemException exception = assertThrows(EmptyItemException.class, () -> {
+            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        });
+
+        assertEquals("Looks like there’s nothing here yet. Add a menu to get started!", exception.getMessage());
+    }
+
+    @Test
+    public void givenCurrentUserHasMenus_whenSearchingForInvalidTitle_thenThrowMenuNotFoundException(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+
+        //add first menu for company 1
+        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        MenuNotFoundException exception = assertThrows(MenuNotFoundException.class, () -> {
+            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        });
+
+        assertEquals("Menu with title: \"transfer\" not found.", exception.getMessage());
+    }
+
+    @Test
+    public void shouldNotAllowMenuSearchWhenCompanyIsNotAuthenticated(){
+        AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
+            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        });
+
+        assertEquals("Authentication required.", exception.getMessage());
     }
 }

@@ -1,7 +1,11 @@
 package main.service.implementations;
 
 import main.dtos.requests.MenuRequest;
+import main.dtos.requests.MenuTitleRequest;
 import main.dtos.responses.MenuResponse;
+import main.dtos.responses.MenuTitleResponse;
+import main.exceptions.EmptyItemException;
+import main.exceptions.MenuNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.users.Company;
 import main.models.users.Menu;
@@ -31,6 +35,24 @@ public class MenuServiceImpl implements MenuService {
         Menu savedMenu = saveMenuForCompany(activeCompanySession, request);
         addMenuToActiveCompany(activeCompanySession, savedMenu);
         return new MenuResponse(savedMenu.getCompanyId(), savedMenu.getId(), "Awesome! Your menu is now live.");
+    }
+
+    @Override
+    public MenuTitleResponse findByMenuTitle(MenuTitleRequest menuTitleRequest) {
+        Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        if(company.getDefaultMenus().isEmpty()){
+            throw new EmptyItemException("Looks like there’s nothing here yet. Add a menu to get started!");
+        }
+        return getMenuForAuthenticatedCompany(company,menuTitleRequest.getMenuTitle());
+    }
+
+    private MenuTitleResponse getMenuForAuthenticatedCompany(Company company, String titleRequest) {
+        for(Menu menu : company.getDefaultMenus()){
+                if (menu.getTitle().equalsIgnoreCase(titleRequest)){
+                    return new MenuTitleResponse( menu.getId(), menu.getTitle(), true);
+                }
+            }
+        throw new MenuNotFoundException(String.format("Menu with title: \"%s\" not found.", titleRequest));
     }
 
     private Menu saveMenuForCompany(Company activeCompanySession, MenuRequest request) {
