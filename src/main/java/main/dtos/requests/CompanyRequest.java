@@ -1,7 +1,8 @@
-package main.dtos.signUp;
+package main.dtos.requests;
 
 import lombok.*;
-import main.models.enums.Category;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -10,10 +11,10 @@ import main.models.enums.Category;
 @ToString
 public class CompanyRequest {
     private String companyName;
-    private String companyPhone;
+    private List<String> companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
-    private Category category;
+    private String category;
     private String companyApiKey;
     private String baseUrl;
 }

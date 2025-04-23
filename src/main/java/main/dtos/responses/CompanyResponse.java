@@ -1,4 +1,4 @@
-package main.dtos.signUp;
+package main.dtos.responses;
 
 import lombok.*;
 
@@ -8,5 +8,8 @@ import lombok.*;
 @Setter
 @ToString
 public class CompanyResponse {
+    private String message;
+    private String id;
     private boolean isSuccess;
+    private boolean IsLoggedIn;
 }

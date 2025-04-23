@@ -2,7 +2,7 @@ package main.config;
 
 import main.models.users.Company;
 import main.models.security.CompanyPrincipal;
-import main.repository.CompanyRepo;
+import main.repositories.CompanyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,7 +23,7 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String companyEmail) throws UsernameNotFoundException {
         Company company = companyRepo.findByCompanyEmail(companyEmail);
         if (company == null) {
-            throw new UsernameNotFoundException("Company with account:" +companyEmail+" not found");
+            throw new UsernameNotFoundException("Company with account: " +companyEmail+" not found");
         }
         return new CompanyPrincipal(company);
     }

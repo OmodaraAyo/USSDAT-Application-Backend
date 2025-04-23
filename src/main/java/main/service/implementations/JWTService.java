@@ -1,4 +1,4 @@
-package main.service;
+package main.service.implementations;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -30,13 +30,13 @@ public class JWTService {
             throw new RuntimeException(e);
         }
     }
-    public String generateToken(String username) {
+    public String generateToken(String companyEmail) {
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .claims()
                 .add(claims)
-                .subject(username)
+                .subject(companyEmail)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
                 .and()
@@ -49,7 +49,7 @@ public class JWTService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUserName(String jwtToken) {
+    public String extractCompanyEmail(String jwtToken) {
         return extractClaim(jwtToken, Claims::getSubject);
     }
 
@@ -67,7 +67,7 @@ public class JWTService {
     }
 
     public boolean validateToken(String jwtToken, UserDetails userDetails) {
-        final String username = extractUserName(jwtToken);
+        final String username = extractCompanyEmail(jwtToken);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(jwtToken));
     }
 

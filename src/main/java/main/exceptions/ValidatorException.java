@@ -1,7 +1,13 @@
 package main.exceptions;
 
 
+import main.dtos.requests.CompanyRequest;
+import main.dtos.requests.MenuRequest;
+import main.dtos.requests.UpdateCompanyRequest;
+import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
+
+import java.util.List;
 
 public class ValidatorException extends RuntimeException {
 
@@ -14,20 +20,74 @@ public class ValidatorException extends RuntimeException {
 
     public static void validateCompanyName(String companyName){
         String pattern = ".*[@#$%,!?/\\\\].*";
-        if(companyName == null || companyName.isEmpty() || companyName.trim().isEmpty() || companyName.matches(pattern)){
+
+        if(companyName == null || companyName.isEmpty() || companyName.trim().isEmpty()){
+            throw new ValidatorException("Company name is required");
+        }
+        if(companyName.matches(pattern)){
             throw new ValidatorException("The following characters are not allowed: @, #, $, %, ,, !, ?, /, \\. Please remove them and try again.");
         }
     }
     public static void validateEmail(String email){
         EmailValidator emailValidator = EmailValidator.getInstance(false, true);
-        if(email == null || email.isEmpty() || email.trim().isEmpty() || !emailValidator.isValid(email.trim())){
+
+        if(email == null || email.isEmpty() || email.trim().isEmpty()){
+            throw new ValidatorException("Email is required");
+        }
+        if(!emailValidator.isValid(email.trim())){
             throw new ValidatorException("Invalid email address.");
         }
     }
 
-    public static void validatePhoneNumber(String phoneNumber) {
-        if(phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.trim().isEmpty() || !phoneNumber.matches(NIGERIA_PHONE_NUMBER_PATTERN)){
-            throw new ValidatorException("Invalid phone number. Please try again");
+    public static void validatePhoneNumber(List<String> phoneNumbers) {
+
+        for(String phoneNumber : phoneNumbers){
+
+            if(phoneNumber == null || phoneNumber.isEmpty() || phoneNumber.trim().isEmpty()){
+                throw new ValidatorException("Phone number is required");
+            }
+            if(!phoneNumber.matches(NIGERIA_PHONE_NUMBER_PATTERN)){
+                throw new ValidatorException("Invalid phone number. Please try again");
+            }
+
+        }
+    }
+
+    public static void ensureRequiredFieldsArePresent(CompanyRequest companyRequest){
+
+        String regNumber = companyRequest.getBusinessRegistrationNumber();
+
+        if(regNumber == null || regNumber.isEmpty() || regNumber.trim().isEmpty()){
+            throw new ValidatorException("Business registration number is required");
+        }
+        if(companyRequest.getCategory() == null){
+            throw new ValidatorException("You must select a category");
+        }
+    }
+
+    public static void validateSelectedCategory(String selectedCategory){
+        Category.getCategory(selectedCategory);
+    }
+
+    public static void validateUpdateRequestDetails(UpdateCompanyRequest request){
+        if(request.getCompanyRequest().getCompanyPhone() == null || request.getCompanyRequest().getCompanyPhone().isEmpty()) {
+            throw new ValidatorException("At least one phone number is required");
+        }
+        if(request.getCompanyRequest().getCategory() == null || request.getCompanyRequest().getCategory().trim().isEmpty()) {
+            throw new ValidatorException("Category is required");
+        }
+        if(request.getCompanyRequest().getCompanyApiKey() == null || request.getCompanyRequest().getCompanyApiKey().trim().isEmpty()) {
+            throw new ValidatorException("Api key is required");
+        }
+        if(request.getCompanyRequest().getBaseUrl() == null || request.getCompanyRequest().getBaseUrl().trim().isEmpty()) {
+            throw new ValidatorException("Base url is required");
+        }
+    }
+
+
+    public static void validateMenuRequest(MenuRequest request) {
+        if(request.getTitle() == null || request.getTitle().trim().isEmpty()){
+            throw new ValidatorException("Title cannot be empty");
         }
     }
 }
