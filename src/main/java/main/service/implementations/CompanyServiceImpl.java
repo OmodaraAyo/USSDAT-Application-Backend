@@ -34,10 +34,7 @@ public class CompanyServiceImpl implements CompanyService {
     private CompanyResponse registerNewCompany(CompanyRequest companyRequest) {
         Company newCompany = new Company();
         newCompany.setCompanyName(companyRequest.getCompanyName());
-<<<<<<< HEAD
         newCompany.setCompanyEmail(companyRequest.getCompanyEmail());
-=======
->>>>>>> 3db89af4e11e20a6c5944f3c02400259383175d6
         newCompany.setCompanyPhone(companyRequest.getCompanyPhone());
         newCompany.setCompanyEmail(companyRequest.getCompanyEmail());
         newCompany.setPassword(bCryptPasswordEncoder.encode(GeneratorUtil.generateKey(16)));
