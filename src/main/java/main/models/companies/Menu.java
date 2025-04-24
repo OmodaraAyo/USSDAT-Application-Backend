@@ -1,4 +1,4 @@
-package main.models.users;
+package main.models.companies;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;

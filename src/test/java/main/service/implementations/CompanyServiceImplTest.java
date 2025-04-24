@@ -15,7 +15,7 @@ import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.security.CompanyPrincipal;
-import main.models.users.Company;
+import main.models.companies.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.CompanyRepo;
 import main.service.interfaces.CompanyService;

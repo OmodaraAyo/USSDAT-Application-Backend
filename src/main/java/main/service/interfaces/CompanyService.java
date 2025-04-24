@@ -11,7 +11,7 @@ import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
 import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
-import main.models.users.Company;
+import main.models.companies.Company;
 
 import java.util.List;
 

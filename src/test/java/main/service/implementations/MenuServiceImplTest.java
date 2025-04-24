@@ -1,17 +1,12 @@
 package main.service.implementations;
 
-import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
-import main.dtos.requests.companyFaceRequest.FindMenuOptionByIdRequest;
-import main.dtos.requests.companyFaceRequest.MenuOptionRequest;
-import main.dtos.requests.companyFaceRequest.UpdateOptionRequest;
-import main.dtos.responses.companyFaceResponse.DeleteMenuOptionResponse;
-import main.dtos.responses.companyFaceResponse.MenuOptionResponse;
-import main.dtos.responses.companyFaceResponse.UpdateOptionResponse;
+import main.dtos.requests.companyFaceRequest.*;
+import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
 import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.security.CompanyPrincipal;
-import main.models.users.Company;
+import main.models.companies.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
