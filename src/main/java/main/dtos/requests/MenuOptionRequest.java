@@ -1,4 +1,4 @@
-package main.dtos.responses;
+package main.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class MenuTitleResponse {
-    private String id;
-    private String title;
-    private boolean isSuccess;
+public class MenuOptionRequest {
+    private String menuTitle;
 }

@@ -1,11 +1,11 @@
 package main.models.users;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,7 +16,8 @@ public class Menu {
     private String companyId;
     @Id
     private String id;
-    private String title;
+    @Setter(AccessLevel.NONE)
+    private List<Option> options = new ArrayList<>();
     private String createdAt;
     private String updatedAt;
 }

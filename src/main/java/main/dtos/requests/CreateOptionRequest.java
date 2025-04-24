@@ -5,10 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@AllArgsConstructor
 @Setter
-public class MenuTitleRequest {
-    private String menuTitle;
+@Getter
+public class CreateOptionRequest {
+    private String title;
 }

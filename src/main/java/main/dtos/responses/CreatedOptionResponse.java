@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class DeleteResponse {
-    private String message;
+public class CreatedOptionResponse {
+    private String companyId;
+    private String menuId;
+    private String optionId;
+    private String response;
     private boolean isSuccess;
 }

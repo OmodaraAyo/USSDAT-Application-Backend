@@ -1,6 +1,7 @@
 package main.dtos.responses;
 
 import lombok.*;
+import main.models.users.Menu;
 
 @NoArgsConstructor
 @AllArgsConstructor

@@ -2,9 +2,11 @@ package main.exceptions;
 
 
 import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.MenuRequest;
+import main.dtos.requests.CreateOptionRequest;
 import main.dtos.requests.UpdateCompanyRequest;
 import main.models.enums.Category;
+import main.models.users.Company;
+import main.models.users.Option;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.List;
@@ -84,10 +86,17 @@ public class ValidatorException extends RuntimeException {
         }
     }
 
+    public static void validateOptionRequest(String optionRequest) {
+        if(optionRequest == null || optionRequest.trim().isEmpty()){
+            throw new ValidatorException("Please enter a menu title.");
+        }
+    }
 
-    public static void validateMenuRequest(MenuRequest request) {
-        if(request.getTitle() == null || request.getTitle().trim().isEmpty()){
-            throw new ValidatorException("Title cannot be empty");
+    public static void validateDuplicateTitle(Company activeCompanySession, CreateOptionRequest optionRequest) {
+        for (Option option : activeCompanySession.getMenu().getOptions()) {
+            if (option.getTitle().equalsIgnoreCase(optionRequest.getTitle())) {
+                throw new ValidatorException("Oops! A menu titled 'Register' already exists. Please try another name.");
+            }
         }
     }
 }

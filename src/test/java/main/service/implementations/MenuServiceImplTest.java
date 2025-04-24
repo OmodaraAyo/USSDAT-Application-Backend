@@ -1,15 +1,9 @@
 package main.service.implementations;
 
-import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.LoginRequest;
-import main.dtos.requests.MenuRequest;
-import main.dtos.requests.MenuTitleRequest;
-import main.dtos.responses.CompanyResponse;
-import main.dtos.responses.LoginResponse;
-import main.dtos.responses.MenuResponse;
-import main.dtos.responses.MenuTitleResponse;
+import main.dtos.requests.*;
+import main.dtos.responses.*;
 import main.exceptions.EmptyItemException;
-import main.exceptions.MenuNotFoundException;
+import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.security.CompanyPrincipal;
 import main.models.users.Company;
@@ -28,9 +22,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -48,7 +44,6 @@ public class MenuServiceImplTest {
     @Autowired
     private CompanyService companyService;
 
-//    private CompanyResponse companyResponse;
 
     @BeforeEach
     public void startAllWithThis(){
@@ -68,61 +63,77 @@ public class MenuServiceImplTest {
     }
 
     @Test
-    public void shouldNotAddNewMenuWhenCompanyIsNotAuthenticated(){
+    public void shouldNotAddMenuOptionWhenCompanyIsNotAuthenticated(){
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            menuService.addNewMenu(new MenuRequest("register"));
+            menuService.addNewOption(new CreateOptionRequest("register"));
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
 
-
     @Test
-    public void shouldAddMenuWhenCompanyIsAuthenticated(){
+    public void menuOptions_shouldBeEmptyByDefault(){
         String firstCompanyPassword = CompanyServiceImpl.genPass;
         LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
         assertTrue(loginResponse.getIsLoggedIn());
 
         Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-
         CompanyPrincipal principal = new CompanyPrincipal(company);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        assertTrue(company.isLoggedIn());
-        assertTrue(company.getDefaultMenus().isEmpty());
 
-        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
-        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+        Company refreshCompany1 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1.isLoggedIn());
+        assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
+    }
 
-        assertTrue(company.isLoggedIn());
-        Company refreshCompany = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertFalse(refreshCompany.getDefaultMenus().isEmpty());
-        assertEquals("register", refreshCompany.getDefaultMenus().get(0).getTitle());
+
+    @Test
+    public void givenAuthenticatedCompanyWithEmptyMenuOption_whenOptionIsAdded_thenMenuIsNotEmpty(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Company refreshCompany1 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1.isLoggedIn());
+        assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
+
+        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
+        Company refreshCompany2 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany2.isLoggedIn());
+        assertFalse(refreshCompany2.getMenu().getOptions().isEmpty());
+        assertEquals("register", refreshCompany2.getMenu().getOptions().get(0).getTitle());
+        System.out.println("Saved option: "+ refreshCompany2.getMenu().getOptions().get(0).getTitle());
     }
 
     @Test
-    public void shouldAllowAuthenticatedCompaniesToModifyMenu(){
-        String firstCompanyPassword = CompanyServiceImpl.genPass;
-        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertFalse(company.isLoggedIn());
+    public void whenMultipleCompaniesAddOptionsSimultaneously_thenMenusAreUpdatedCorrectly(){
 
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
         LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
         assertTrue(loginResponse.getIsLoggedIn());
 
-        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         CompanyPrincipal principal = new CompanyPrincipal(company);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        assertTrue(refreshFirstCompany1.isLoggedIn());
-        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
 
-        //add first menu for company 1
-        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
-        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+        Company refreshCompany1 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1.isLoggedIn());
+        assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
-        Company refreshFirstCompanyII =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertTrue(refreshFirstCompanyII.isLoggedIn());
-        assertFalse(refreshFirstCompanyII.getDefaultMenus().isEmpty());
-        assertEquals("register", refreshFirstCompanyII.getDefaultMenus().get(0).getTitle());
+        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
+        Company refreshCompany1II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1II.isLoggedIn());
+        assertFalse(refreshCompany1II.getMenu().getOptions().isEmpty());
+        assertEquals("register", refreshCompany1II.getMenu().getOptions().get(0).getTitle());
+        assertThat(refreshCompany1II.getMenu().getOptions(), hasSize(1));
 
 
         CompanyRequest companyRequest2 = new CompanyRequest();
@@ -141,52 +152,70 @@ public class MenuServiceImplTest {
 
         LoginResponse loginResponse2 = companyService.signIn(new LoginRequest("example@gmail.com", secondRegisteredCompanyPassword));
         assertTrue(loginResponse2.getIsLoggedIn());
-
-        Company refreshSecondCompany2 = companyService.getByCompanyEmail("example@gmail.com");
         CompanyPrincipal principal2 = new CompanyPrincipal(company2);
         UsernamePasswordAuthenticationToken auth2 = new UsernamePasswordAuthenticationToken(principal2, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth2);
-        assertTrue(refreshSecondCompany2.isLoggedIn());
-        assertTrue(refreshSecondCompany2.getDefaultMenus().isEmpty());
+        Company refreshCompany2 = companyService.getByCompanyEmail("example@gmail.com");
+        assertTrue(refreshCompany2.isLoggedIn());
+        assertTrue(refreshCompany2.getMenu().getOptions().isEmpty());
+
 
         //add first menu for company 2
-        MenuResponse savedMenu2 = menuService.addNewMenu(new MenuRequest("register"));
-        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+        CreatedOptionResponse addFirstMenuOptionFoeCompany2 = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", addFirstMenuOptionFoeCompany2.getResponse());
+        Company refreshCompany2II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany2II.isLoggedIn());
+        assertFalse(refreshCompany2II.getMenu().getOptions().isEmpty());
+        assertThat(refreshCompany2II.getMenu().getOptions(), hasSize(1));
+        assertEquals("register", refreshCompany2II.getMenu().getOptions().get(0).getTitle());
+    }
 
-        Company refreshSecondCompany2II = companyService.getByCompanyEmail("example@gmail.com");
-        assertTrue(refreshSecondCompany2II.isLoggedIn());
-        assertFalse(refreshSecondCompany2II.getDefaultMenus().isEmpty());
-        assertEquals("register", refreshSecondCompany2II.getDefaultMenus().get(0).getTitle());
+    @Test
+    public void givenAuthenticatedCompany_whenAddingEmptyOrNullOption_thenThrowValidationException(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
 
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        Company refreshCompany1 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1.isLoggedIn());
+        assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
+
+        ValidatorException exception = assertThrows(ValidatorException.class, () -> {
+            menuService.addNewOption(new CreateOptionRequest("   "));
+        });
+        assertEquals("Please enter a menu title.", exception.getMessage());
     }
 
     @Test
     public void shouldNotSaveDuplicateMenuItems(){
         String firstCompanyPassword = CompanyServiceImpl.genPass;
-        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertFalse(company.isLoggedIn());
-
         LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
         assertTrue(loginResponse.getIsLoggedIn());
 
-        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         CompanyPrincipal principal = new CompanyPrincipal(company);
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
-        assertTrue(refreshFirstCompany1.isLoggedIn());
-        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
 
-        //add first menu for company 1
-        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
-        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+        Company refreshCompany1 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1.isLoggedIn());
+        assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
-        Company refreshFirstCompanyII =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertTrue(refreshFirstCompanyII.isLoggedIn());
-        assertFalse(refreshFirstCompanyII.getDefaultMenus().isEmpty());
-        assertEquals("register", refreshFirstCompanyII.getDefaultMenus().get(0).getTitle());
+        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
+        Company refreshCompany1II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshCompany1II.isLoggedIn());
+        assertFalse(refreshCompany1II.getMenu().getOptions().isEmpty());
+        assertEquals("register", refreshCompany1II.getMenu().getOptions().get(0).getTitle());
+        assertThat(refreshCompany1II.getMenu().getOptions(), hasSize(1));
 
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            menuService.addNewMenu(new MenuRequest("register"));
+            menuService.addNewOption(new CreateOptionRequest("register"));
         });
 
         assertEquals("Oops! A menu titled 'Register' already exists. Please try another name.", exception.getMessage());
@@ -207,21 +236,21 @@ public class MenuServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         assertTrue(refreshFirstCompany1.isLoggedIn());
-        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
         //add first menu for company 2
-        MenuResponse savedMenu2 = menuService.addNewMenu(new MenuRequest("Check balance"));
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
         //add first menu for company 3
-        MenuResponse savedMenu3 = menuService.addNewMenu(new MenuRequest("Transfer"));
+        CreatedOptionResponse savedMenu3 = menuService.addNewOption(new CreateOptionRequest("Transfer"));
         assertEquals("Awesome! Your menu is now live.", savedMenu3.getResponse());
 
-        MenuTitleResponse response = menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        MenuOptionResponse response = menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
         assertTrue(response.isSuccess());
         assertEquals("Transfer", response.getTitle());
     }
@@ -240,10 +269,10 @@ public class MenuServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         assertTrue(refreshFirstCompany1.isLoggedIn());
-        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         EmptyItemException exception = assertThrows(EmptyItemException.class, () -> {
-            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
         });
 
         assertEquals("Looks like there’s nothing here yet. Add a menu to get started!", exception.getMessage());
@@ -263,25 +292,143 @@ public class MenuServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
         assertTrue(refreshFirstCompany1.isLoggedIn());
-        assertTrue(refreshFirstCompany1.getDefaultMenus().isEmpty());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        MenuResponse savedMenu = menuService.addNewMenu(new MenuRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
-        MenuNotFoundException exception = assertThrows(MenuNotFoundException.class, () -> {
-            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+        MenuOptionNotFoundException exception = assertThrows(MenuOptionNotFoundException.class, () -> {
+            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
         });
 
-        assertEquals("Menu with title: \"transfer\" not found.", exception.getMessage());
+        assertEquals("No menu option found with the title \"transfer\".", exception.getMessage());
     }
+
 
     @Test
     public void shouldNotAllowMenuSearchWhenCompanyIsNotAuthenticated(){
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            menuService.findByMenuTitle(new MenuTitleRequest("transfer"));
+            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
+        });
+        assertEquals("Authentication required.", exception.getMessage());
+    }
+
+    @Test
+    public void givenAuthenticatedUserWithMenu_whenMenuIsDeletedById_thenReturnSuccessResponse(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
+
+        //add first menu for company 1
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        DeleteMenuOptionResponse deletedMenuResponse = menuService.deleteMenuOptionById(savedMenu2.getOptionId());
+        System.out.println("Menu OptionId: "+savedMenu2.getOptionId());
+        assertTrue(deletedMenuResponse.isSuccess());
+        assertEquals("Deleted successfully.",deletedMenuResponse.getMessage());
+    }
+
+    @Test
+    public void givenAuthenticatedUserWithMenu_whenFindingMenuById_thenReturnSuccessResponse(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
+
+        //add first menu for company 1
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(new FindMenuOptionByIdRequest(savedMenu2.getOptionId()));
+        assertTrue(menuOptionResponse.isSuccess());
+        assertEquals("Check balance", menuOptionResponse.getTitle());
+    }
+
+    @Test
+    public void givenAuthenticatedUserWithMenu_whenFindingMenuWIthInvalidId_thenThrowMenuNotFoundException(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
+
+        //add first menu for company 1
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        MenuOptionNotFoundException exception = assertThrows(MenuOptionNotFoundException.class, ()-> {
+            menuService.getMenuOptionById(new FindMenuOptionByIdRequest("123345669"));
         });
 
-        assertEquals("Authentication required.", exception.getMessage());
+        assertEquals("No menu option found with this id: \"123345669\".", exception.getMessage());
+    }
+
+    @Test
+    public void givenAuthenticatedUserWithMenu_canUpdateMenuOption_thenReturnSuccessResponse(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
+
+        //add first menu for company 1
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        UpdateOptionResponse updatedMenuOption = menuService.updateMenuOption(new UpdateOptionRequest(savedMenu.getOptionId(), "Transfer"));
+
     }
 }

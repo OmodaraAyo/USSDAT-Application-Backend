@@ -1,20 +1,24 @@
 package main.service.implementations;
 
-import main.dtos.requests.MenuRequest;
-import main.dtos.requests.MenuTitleRequest;
-import main.dtos.responses.MenuResponse;
-import main.dtos.responses.MenuTitleResponse;
+import main.dtos.requests.*;
+import main.dtos.responses.CreatedOptionResponse;
+import main.dtos.responses.DeleteMenuOptionResponse;
+import main.dtos.responses.MenuOptionResponse;
+import main.dtos.responses.UpdateOptionResponse;
 import main.exceptions.EmptyItemException;
-import main.exceptions.MenuNotFoundException;
+import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.users.Company;
-import main.models.users.Menu;
+import main.models.users.Option;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
 import main.service.interfaces.MenuService;
 import main.utils.DateUtil;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -28,59 +32,110 @@ public class MenuServiceImpl implements MenuService {
     @Autowired
     private AuthenticatedCompanyService authenticatedCompanyService;
 
-    @Override
-    public MenuResponse addNewMenu(MenuRequest request) {
-        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
 
-        Menu savedMenu = saveMenuForCompany(activeCompanySession, request);
-        addMenuToActiveCompany(activeCompanySession, savedMenu);
-        return new MenuResponse(savedMenu.getCompanyId(), savedMenu.getId(), "Awesome! Your menu is now live.");
+    @Override
+    public CreatedOptionResponse addNewOption(CreateOptionRequest optionRequest) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateOptionRequest(optionRequest.getTitle());
+        ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
+        String generatedOptionId = generateOptionId();
+        Company savedCompany = createNewOption(activeCompanySession, optionRequest, generatedOptionId);
+        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
     }
 
     @Override
-    public MenuTitleResponse findByMenuTitle(MenuTitleRequest menuTitleRequest) {
-        Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-        if(company.getDefaultMenus().isEmpty()){
+    public MenuOptionResponse getMenuOptionByTitle(MenuOptionRequest menuOptionRequest) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        return getAuthenticatedCompanyOptionByTitle(activeCompanySession, menuOptionRequest.getMenuTitle());
+    }
+
+    @Override
+    public DeleteMenuOptionResponse deleteMenuOptionById(String menuId) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        return deleteMenu(activeCompanySession, menuId);
+    }
+
+    @Override
+    public MenuOptionResponse getMenuOptionById(FindMenuOptionByIdRequest request) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        return getAuthenticatedCompanyMenuOptionById(activeCompanySession, request.getOptionId());
+    }
+
+    @Override
+    public UpdateOptionResponse updateMenuOption(UpdateOptionRequest updateOptionRequest) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        return updatedOptionResponse(activeCompanySession, updateOptionRequest);
+    }
+
+    private UpdateOptionResponse updatedOptionResponse(Company activeCompanySession, UpdateOptionRequest updateOptionRequest) {
+        Option thisOption = fetchMenuById(activeCompanySession, updateOptionRequest.getOptionId());
+        assert thisOption != null;
+        thisOption.setTitle(updateOptionRequest.getNewOptionName());
+        thisOption.setUpdatedAt(DateUtil.getCurrentDate());
+//        activeCompanySession.getMenu().getOptions().set(, thisOption); this is where you are currently
+        companyService.saveCompany(activeCompanySession);
+        return new UpdateOptionResponse(thisOption.getOptionId(), true, DateUtil.getCurrentDate());
+    }
+
+    private String generateOptionId(){
+        return ObjectId.get().toString();
+    }
+
+    private Company createNewOption(Company activeCompanySession, CreateOptionRequest optionRequest, String generatedOptionId) {
+        Option option = new Option();
+        option.setMenuId(activeCompanySession.getMenu().getId());
+        option.setOptionId(generatedOptionId);
+        option.setTitle(optionRequest.getTitle());
+        option.setCreatedAt(DateUtil.getCurrentDate());
+        option.setUpdatedAt(DateUtil.getCurrentDate());
+        activeCompanySession.getMenu().getOptions().add(option);
+        return companyService.saveCompany(activeCompanySession);
+    }
+
+    private MenuOptionResponse getAuthenticatedCompanyMenuOptionById(Company activeCompanySession, String optionId) {
+        for (Option option : activeCompanySession.getMenu().getOptions()) {
+            if (option.getOptionId().equals(optionId)) {
+                return new MenuOptionResponse(option.getTitle(), true);
+            }
+        }
+        throw new MenuOptionNotFoundException(String.format("No menu option found with this id: \"%s\".", optionId));
+    }
+
+    private DeleteMenuOptionResponse deleteMenu(Company company, String menuId) {
+        Option getMenuOption = fetchMenuById(company, menuId);
+        if(getMenuOption != null) {
+            company.getMenu().getOptions().remove(getMenuOption);
+            return new DeleteMenuOptionResponse("Deleted successfully.", true);
+        }
+        return new DeleteMenuOptionResponse("Menu not found.", false);
+    }
+
+    private Option fetchMenuById(Company company, String menuId) {
+        for(Option option : company.getMenu().getOptions()){
+            if(option.getOptionId().equalsIgnoreCase(menuId)){
+                return option;
+            }
+        }
+        return null;
+    }
+
+    private void checkIfActiveCompanySessionHaveAMenu(List<Option> menuOptions) {
+        if(menuOptions.isEmpty()){
             throw new EmptyItemException("Looks like there’s nothing here yet. Add a menu to get started!");
         }
-        return getMenuForAuthenticatedCompany(company,menuTitleRequest.getMenuTitle());
     }
 
-    private MenuTitleResponse getMenuForAuthenticatedCompany(Company company, String titleRequest) {
-        for(Menu menu : company.getDefaultMenus()){
-                if (menu.getTitle().equalsIgnoreCase(titleRequest)){
-                    return new MenuTitleResponse( menu.getId(), menu.getTitle(), true);
+    private MenuOptionResponse getAuthenticatedCompanyOptionByTitle(Company company, String titleRequest) {
+        for(Option option : company.getMenu().getOptions()){
+                if (option.getTitle().equalsIgnoreCase(titleRequest)){
+                    return new MenuOptionResponse(option.getTitle(), true);
                 }
             }
-        throw new MenuNotFoundException(String.format("Menu with title: \"%s\" not found.", titleRequest));
-    }
-
-    private Menu saveMenuForCompany(Company activeCompanySession, MenuRequest request) {
-        validateCompanyRequest(activeCompanySession,request);
-        Menu menu = new Menu();
-        menu.setCompanyId(activeCompanySession.getCompanyId());
-        menu.setTitle(request.getTitle());
-        menu.setCreatedAt(DateUtil.getCurrentDate());
-        menu.setUpdatedAt(DateUtil.getCurrentDate());
-        return menuRepo.save(menu);
-    }
-
-    private void addMenuToActiveCompany(Company activeCompanySession, Menu savedMenu) {
-        activeCompanySession.getDefaultMenus().add(savedMenu);
-        companyService.saveCompany(activeCompanySession);
-    }
-
-    private void validateCompanyRequest(Company activeCompanySession, MenuRequest request) {
-        ValidatorException.validateMenuRequest(request);
-        checkIfMenuTitleExistAlready(activeCompanySession, request);
-    }
-
-    private void checkIfMenuTitleExistAlready(Company activeCompanySession, MenuRequest request) {
-        for (Menu menu : activeCompanySession.getDefaultMenus()) {
-            if (menu.getTitle().equalsIgnoreCase(request.getTitle())) {
-                throw new ValidatorException("Oops! A menu titled 'Register' already exists. Please try another name.");
-            }
-        }
+        throw new MenuOptionNotFoundException(String.format("No menu option found with the title \"%s\".", titleRequest));
     }
 
 }
