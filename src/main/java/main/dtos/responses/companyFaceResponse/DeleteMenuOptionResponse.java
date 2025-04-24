@@ -1,4 +1,4 @@
-package main.dtos.requests.companyFaceRequest;
+package main.dtos.responses.companyFaceResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,9 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
-public class MenuRequest {
-    private String companyId;
+@Setter
+public class DeleteMenuOptionResponse {
+    private String message;
+    private boolean isSuccess;
 }

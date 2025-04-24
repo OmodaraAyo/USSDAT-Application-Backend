@@ -113,6 +113,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Hamcrest matchers: JUnit readability -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Validator -->
         <dependency>
             <groupId>commons-validator</groupId>

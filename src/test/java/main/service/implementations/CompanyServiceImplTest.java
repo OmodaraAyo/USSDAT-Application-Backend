@@ -46,6 +46,7 @@ public class CompanyServiceImplTest {
     @Autowired
     private MongoTemplate mongoTemplate;
 
+
     @Autowired
     private CompanyService companyService;
 
@@ -73,6 +74,7 @@ public class CompanyServiceImplTest {
         assertTrue(companyResponse.isSuccess());
         assertEquals(1, companyRepo.count());
     }
+
 
     @Test
     public void shouldRejectCompanyName_withSpecialCharacters(){
@@ -419,6 +421,12 @@ public class CompanyServiceImplTest {
         });
 
         assertEquals("Account is deactivated. Please contact support.", exception.getMessage());
+
+        RuntimeException exception2 = assertThrows(RuntimeException.class, () -> {
+            companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", "Ayodele01$"));
+        });
+
+        assertEquals("Account is deactivated. Please contact support.", exception2.getMessage());
     }
 
     @Test
@@ -444,4 +452,5 @@ public class CompanyServiceImplTest {
 //        companyService.addMenu(new MenuRequest("register"));
 
     }
+
 }

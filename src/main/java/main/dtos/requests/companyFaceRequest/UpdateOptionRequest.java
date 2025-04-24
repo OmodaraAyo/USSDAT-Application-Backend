@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
-@Setter
+@AllArgsConstructor
 @Getter
-public class MenuRequest {
-    private String companyId;
+@Setter
+public class UpdateOptionRequest {
+    private String optionId;
+    private String newOptionName;
 }

@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
-public class MenuRequest {
-    private String companyId;
+@Setter
+public class MenuOptionRequest {
+    private String menuTitle;
 }

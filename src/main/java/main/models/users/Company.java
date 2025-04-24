@@ -35,8 +35,7 @@ public class Company {
     private String apiKey;
     private String baseUrl;
     private Role role;
-    @DBRef
-    private List<Menu> defaultMenus = new ArrayList<>();
+    private Menu menu = new Menu();
     private boolean isActive;
     private boolean isFirstLogin;
     private boolean isLoggedIn;
