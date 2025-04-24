@@ -76,24 +76,40 @@ public class MenuServiceImpl implements MenuService {
         assert thisOption != null;
         thisOption.setTitle(updateOptionRequest.getNewOptionName());
         thisOption.setUpdatedAt(DateUtil.getCurrentDate());
-//        activeCompanySession.getMenu().getOptions().set(, thisOption); this is where you are currently
+        updateOption(thisOption, activeCompanySession.getMenu().getOptions(), updateOptionRequest.getOptionId());
+        menuRepo.save(activeCompanySession.getMenu());
         companyService.saveCompany(activeCompanySession);
         return new UpdateOptionResponse(thisOption.getOptionId(), true, DateUtil.getCurrentDate());
+    }
+
+    private void updateOption(Option thisOption, List<Option> options, String optionId) {
+        for (int i = 0; i < options.size(); i++) {
+            if (options.get(i).getOptionId().equals(optionId)) {
+                options.set(i, thisOption);
+                break;
+            }
+        }
     }
 
     private String generateOptionId(){
         return ObjectId.get().toString();
     }
 
+
     private Company createNewOption(Company activeCompanySession, CreateOptionRequest optionRequest, String generatedOptionId) {
-        Option option = new Option();
-        option.setMenuId(activeCompanySession.getMenu().getId());
-        option.setOptionId(generatedOptionId);
-        option.setTitle(optionRequest.getTitle());
-        option.setCreatedAt(DateUtil.getCurrentDate());
-        option.setUpdatedAt(DateUtil.getCurrentDate());
-        activeCompanySession.getMenu().getOptions().add(option);
-        return companyService.saveCompany(activeCompanySession);
+        try{
+            Option option = new Option();
+            option.setMenuId(activeCompanySession.getMenu().getId());
+            option.setOptionId(generatedOptionId);
+            option.setTitle(optionRequest.getTitle());
+            option.setCreatedAt(DateUtil.getCurrentDate());
+            option.setUpdatedAt(DateUtil.getCurrentDate());
+            activeCompanySession.getMenu().getOptions().add(option);
+            menuRepo.save(activeCompanySession.getMenu());
+            return companyService.saveCompany(activeCompanySession);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to create new option: "+e+ " Please try again!");
+        }
     }
 
     private MenuOptionResponse getAuthenticatedCompanyMenuOptionById(Company activeCompanySession, String optionId) {
