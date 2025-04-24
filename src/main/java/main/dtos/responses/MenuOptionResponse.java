@@ -1,4 +1,4 @@
-package main.dtos.requests;
+package main.dtos.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,9 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
-public class MenuRequest {
-    private String companyId;
+@Setter
+public class MenuOptionResponse {
+    private String title;
+    private boolean isSuccess;
 }

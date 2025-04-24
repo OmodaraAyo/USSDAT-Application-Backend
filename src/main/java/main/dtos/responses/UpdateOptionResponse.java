@@ -5,12 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class MenuResponse {
-    private String companyId;
-    private String id;
-    private String response;
+public class UpdateOptionResponse {
+    private String optionId;
+    private boolean isSuccess;
+    private String updatedAt;
 }
