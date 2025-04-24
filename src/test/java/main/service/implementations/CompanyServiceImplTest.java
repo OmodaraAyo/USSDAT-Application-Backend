@@ -429,28 +429,28 @@ public class CompanyServiceImplTest {
         assertEquals("Account is deactivated. Please contact support.", exception2.getMessage());
     }
 
-    @Test
-    public void shouldAllowCompanyToCreateDefaultMenuIfAuthenticated(){
-        String registeredCompanyPassword1 = CompanyServiceImpl.genPass;
-        Company company = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertFalse(company.isLoggedIn());
-
-        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
-        assertTrue(loginResponse.getIsLoggedIn());
-
-        Company refreshCompany = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
-        assertTrue(refreshCompany.isLoggedIn());
-
-        CompanyPrincipal principal = new CompanyPrincipal(company);
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-
-        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
-        assertEquals("Password changed successfully", request.getMessage());
-        assertTrue(refreshCompany.isLoggedIn());
-
-//        companyService.addMenu(new MenuRequest("register"));
-
-    }
+//    @Test
+//    public void shouldAllowCompanyToCreateDefaultMenuIfAuthenticated(){
+//        String registeredCompanyPassword1 = CompanyServiceImpl.genPass;
+//        Company company = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+//        assertFalse(company.isLoggedIn());
+//
+//        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", registeredCompanyPassword1));
+//        assertTrue(loginResponse.getIsLoggedIn());
+//
+//        Company refreshCompany = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
+//        assertTrue(refreshCompany.isLoggedIn());
+//
+//        CompanyPrincipal principal = new CompanyPrincipal(company);
+//        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+//        SecurityContextHolder.getContext().setAuthentication(auth);
+//
+//        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+//        assertEquals("Password changed successfully", request.getMessage());
+//        assertTrue(refreshCompany.isLoggedIn());
+//
+////        companyService.addMenu(new MenuRequest("register"));
+//
+//    }
 
 }

@@ -22,6 +22,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
@@ -424,11 +425,17 @@ public class MenuServiceImplTest {
         CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
+        Company refreshFirstCompany2 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertEquals("register".toLowerCase(), refreshFirstCompany2.getMenu().getOptions().get(0).getTitle().toLowerCase());
+
         //add first menu for company 2
         CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
         UpdateOptionResponse updatedMenuOption = menuService.updateMenuOption(new UpdateOptionRequest(savedMenu.getOptionId(), "Transfer"));
+        assertTrue(updatedMenuOption.isSuccess());
 
+        Company refreshFirstCompany3 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertEquals("Transfer".toLowerCase(), refreshFirstCompany3.getMenu().getOptions().get(0).getTitle().toLowerCase());
     }
 }
