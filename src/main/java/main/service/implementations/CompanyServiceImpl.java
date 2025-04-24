@@ -313,7 +313,7 @@ public class CompanyServiceImpl implements CompanyService {
         Company newCompany = createNewCompany(companyRequest, generatedPassword);
         Company savedCompany = saveNewCompany(newCompany);
 
-//        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
+        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
         return new CompanyResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
     }
 
@@ -327,6 +327,7 @@ public class CompanyServiceImpl implements CompanyService {
         newCompany.setUssdShortCode(generateUssdCode());
         newCompany.setBusinessRegistrationNumber(companyRequest.getBusinessRegistrationNumber());
         newCompany.setCategory(Category.getCategory(companyRequest.getCategory()));
+        newCompany.setBaseUrl(companyRequest.getBaseUrl());
         newCompany.setRole(Role.ADMIN);
         newCompany.setMenu(menuRepo.save(new Menu()));
         newCompany.setCreateAt(DateUtil.getCurrentDate());

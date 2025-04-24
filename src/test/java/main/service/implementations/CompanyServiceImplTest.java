@@ -65,6 +65,7 @@ public class CompanyServiceImplTest {
         companyRequest.setCompanyPhone(List.of("09012345678"));
         companyRequest.setCategory("finance");
         companyRequest.setBusinessRegistrationNumber("123456789");
+        companyRequest.setBaseUrl("https://test@gmail.com");
         companyResponse = companyService.registerCompany(companyRequest);
     }
 
@@ -449,7 +450,7 @@ public class CompanyServiceImplTest {
 //        assertEquals("Password changed successfully", request.getMessage());
 //        assertTrue(refreshCompany.isLoggedIn());
 //
-////        companyService.addMenu(new MenuRequest("register"));
+//        companyService.addMenu(new MenuRequest("register"));
 //
 //    }
 

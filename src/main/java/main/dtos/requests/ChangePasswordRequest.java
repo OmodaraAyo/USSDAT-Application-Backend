@@ -1,5 +1,6 @@
 package main.dtos.requests;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,5 +12,5 @@ import lombok.Setter;
 @Setter
 public class ChangePasswordRequest {
     private String oldPassword;
-    private String newPassword;
+    @Size(min = 9) private String newPassword;
 }
