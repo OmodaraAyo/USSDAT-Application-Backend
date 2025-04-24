@@ -1,15 +1,12 @@
 package main.service.interfaces;
 
+import main.dtos.requests.*;
 import main.dtos.responses.DeleteResponse;
 import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.requests.LoginRequest;
 import main.dtos.responses.LoginResponse;
 import main.dtos.responses.LogoutResponse;
-import main.dtos.requests.CompanyRequest;
 import main.dtos.responses.CompanyResponse;
-import main.dtos.requests.ChangePasswordRequest;
 import main.dtos.responses.ChangePasswordResponse;
-import main.dtos.requests.UpdateCompanyRequest;
 import main.dtos.responses.UpdateCompanyResponse;
 import main.models.users.Company;
 
