@@ -1,9 +1,9 @@
 package main.exceptions;
 
 
-import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.MenuRequest;
-import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.MenuRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.models.enums.Category;
 import org.apache.commons.validator.routines.EmailValidator;
 

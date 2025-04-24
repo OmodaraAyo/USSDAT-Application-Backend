@@ -1,15 +1,14 @@
-package main.dtos.requests;
+package main.dtos.requests.companyFaceRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-public class ChangePasswordRequest {
-    private String oldPassword;
-    private String newPassword;
+public class CompanyDetailsRequest {
+    private String email;
 }

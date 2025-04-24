@@ -1,4 +1,4 @@
-package main.dtos.requests;
+package main.dtos.responses.companyFaceResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
 @Getter
-public class MenuRequest {
-    private String title;
+@Setter
+public class ChangePasswordResponse {
+    private String message;
 }

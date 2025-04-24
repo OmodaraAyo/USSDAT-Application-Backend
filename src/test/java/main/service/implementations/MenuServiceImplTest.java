@@ -1,11 +1,11 @@
 package main.service.implementations;
 
-import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.LoginRequest;
-import main.dtos.requests.MenuRequest;
-import main.dtos.responses.CompanyResponse;
-import main.dtos.responses.LoginResponse;
-import main.dtos.responses.MenuResponse;
+import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.MenuRequest;
+import main.dtos.responses.companyFaceResponse.CompanyResponse;
+import main.dtos.responses.companyFaceResponse.LoginResponse;
+import main.dtos.responses.companyFaceResponse.MenuResponse;
 import main.exceptions.ValidatorException;
 import main.models.security.CompanyPrincipal;
 import main.models.users.Company;

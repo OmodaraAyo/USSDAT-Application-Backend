@@ -1,7 +1,7 @@
 package main.service.interfaces;
 
-import main.dtos.requests.MenuRequest;
-import main.dtos.responses.MenuResponse;
+import main.dtos.requests.companyFaceRequest.MenuRequest;
+import main.dtos.responses.companyFaceResponse.MenuResponse;
 
 public interface MenuService {
 

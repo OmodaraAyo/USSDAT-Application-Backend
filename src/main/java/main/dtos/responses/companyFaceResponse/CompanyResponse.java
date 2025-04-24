@@ -1,4 +1,4 @@
-package main.dtos.responses;
+package main.dtos.responses.companyFaceResponse;
 
 import lombok.*;
 

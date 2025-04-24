@@ -1,14 +1,14 @@
-package main.dtos.requests;
+package main.dtos.responses.companyFaceResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-public class CompanyDetailsRequest {
-    private String email;
+public class LogoutResponse {
+    private String message;
 }

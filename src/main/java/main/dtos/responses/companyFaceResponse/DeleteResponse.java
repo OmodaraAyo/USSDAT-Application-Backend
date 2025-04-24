@@ -1,4 +1,4 @@
-package main.dtos.responses;
+package main.dtos.responses.companyFaceResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class LogoutResponse {
+public class DeleteResponse {
     private String message;
+    private boolean success;
 }

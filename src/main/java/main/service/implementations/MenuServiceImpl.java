@@ -1,7 +1,7 @@
 package main.service.implementations;
 
-import main.dtos.requests.MenuRequest;
-import main.dtos.responses.MenuResponse;
+import main.dtos.requests.companyFaceRequest.MenuRequest;
+import main.dtos.responses.companyFaceResponse.MenuResponse;
 import main.exceptions.ValidatorException;
 import main.models.users.Company;
 import main.models.users.Menu;

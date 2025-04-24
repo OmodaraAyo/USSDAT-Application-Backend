@@ -1,4 +1,4 @@
-package main.dtos.requests;
+package main.dtos.requests.companyFaceRequest;
 
 import lombok.*;
 
