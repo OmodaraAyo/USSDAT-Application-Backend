@@ -2,16 +2,13 @@ package main.service.implementations;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
+import main.dtos.requests.*;
 import main.dtos.responses.DeleteResponse;
 import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.requests.LoginRequest;
 import main.dtos.responses.LoginResponse;
 import main.dtos.responses.LogoutResponse;
-import main.dtos.requests.CompanyRequest;
 import main.dtos.responses.CompanyResponse;
-import main.dtos.requests.ChangePasswordRequest;
 import main.dtos.responses.ChangePasswordResponse;
-import main.dtos.requests.UpdateCompanyRequest;
 import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
@@ -21,7 +18,6 @@ import main.models.users.Menu;
 import main.repositories.CompanyRepo;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
-import main.service.interfaces.MenuService;
 import main.utils.DateUtil;
 import main.utils.GeneratorUtil;
 import main.utils.UssdCounterUtil;
@@ -134,6 +130,8 @@ public class CompanyServiceImpl implements CompanyService {
 
         currentLoggedInCompany.setLoggedIn(false);
         companyRepo.save(currentLoggedInCompany);
+
+
         return new LogoutResponse("Logout successful");
     }
 
@@ -283,7 +281,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createLoginResponseWithoutWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
         loginResponse.setResponse("Login Successful");
         loginResponse.setIsLoggedIn(true);
         loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());
@@ -292,7 +290,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createFirstLoginResponseWithWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
         loginResponse.setResponse("Login Successful");
         loginResponse.setWarning("Your default password is temporary and expires after first use. Please set a new password.");
         loginResponse.setIsLoggedIn(true);
