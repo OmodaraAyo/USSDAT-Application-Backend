@@ -13,4 +13,7 @@ public class FetchMenuResponse {
     private Boolean hasMore;
     private List<UserOptions> options;
     private Integer page;
+
+    public FetchMenuResponse(String string, boolean b) {
+    }
 }

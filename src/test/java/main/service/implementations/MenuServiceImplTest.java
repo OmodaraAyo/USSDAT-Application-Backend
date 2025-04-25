@@ -71,6 +71,7 @@ public class MenuServiceImplTest {
         assertEquals("Authentication required.", exception.getMessage());
     }
 
+
     @Test
     public void menuOptions_shouldBeEmptyByDefault(){
         String firstCompanyPassword = CompanyServiceImpl.genPass;
@@ -438,4 +439,5 @@ public class MenuServiceImplTest {
         Company refreshFirstCompany3 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertEquals("Transfer".toLowerCase(), refreshFirstCompany3.getMenu().getOptions().get(0).getTitle().toLowerCase());
     }
+
 }
