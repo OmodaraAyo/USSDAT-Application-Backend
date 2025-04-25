@@ -1,10 +1,7 @@
 package main.service.implementations;
 
 import main.dtos.requests.*;
-import main.dtos.responses.CreatedOptionResponse;
-import main.dtos.responses.DeleteMenuOptionResponse;
-import main.dtos.responses.MenuOptionResponse;
-import main.dtos.responses.UpdateOptionResponse;
+import main.dtos.responses.*;
 import main.exceptions.EmptyItemException;
 import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
@@ -71,6 +68,17 @@ public class MenuServiceImpl implements MenuService {
         return updatedOptionResponse(activeCompanySession, updateOptionRequest);
     }
 
+    @Override
+    public CompanyMenuOptionResponse getMenuOptionsForCompany(CompanyMenuOptionRequest companyMenuOptionRequest) {
+        Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        checkIfActiveCompanySessionHaveAMenu(company.getMenu().getOptions());
+        CompanyMenuOptionResponse companyMenuOptionResponse = new CompanyMenuOptionResponse();
+        for(Option option : company.getMenu().getOptions()){
+            companyMenuOptionResponse.getMenuOptions().add(option.getTitle());
+        }
+        return companyMenuOptionResponse;
+    }
+
     private UpdateOptionResponse updatedOptionResponse(Company activeCompanySession, UpdateOptionRequest updateOptionRequest) {
         Option thisOption = fetchMenuById(activeCompanySession, updateOptionRequest.getOptionId());
         assert thisOption != null;
@@ -101,7 +109,7 @@ public class MenuServiceImpl implements MenuService {
             Option option = new Option();
             option.setMenuId(activeCompanySession.getMenu().getId());
             option.setOptionId(generatedOptionId);
-            option.setTitle(optionRequest.getTitle());
+            option.setTitle(optionRequest.getTitle().toLowerCase());
             option.setCreatedAt(DateUtil.getCurrentDate());
             option.setUpdatedAt(DateUtil.getCurrentDate());
             activeCompanySession.getMenu().getOptions().add(option);

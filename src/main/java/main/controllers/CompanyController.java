@@ -8,7 +8,6 @@ import main.dtos.responses.CompanyResponse;
 import main.dtos.responses.LoginResponse;
 import main.service.interfaces.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
