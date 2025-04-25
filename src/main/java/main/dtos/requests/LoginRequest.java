@@ -1,4 +1,4 @@
-package main.dtos.Login;
+package main.dtos.requests;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class AdminRequest {
+public class LoginRequest {
     private String companyEmail;
     private String password;
 }

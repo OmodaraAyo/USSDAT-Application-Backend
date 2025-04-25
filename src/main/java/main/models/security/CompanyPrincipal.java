@@ -1,5 +1,6 @@
-package main.models;
+package main.models.security;
 
+import main.models.users.Company;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,10 +10,10 @@ import java.util.Collections;
 
 public class CompanyPrincipal implements UserDetails {
 
-    private final CompanyAdmin companyAdmin;
+    private final Company company;
 
-    public CompanyPrincipal(CompanyAdmin companyAdmin) {
-        this.companyAdmin = companyAdmin;
+    public CompanyPrincipal(Company company) {
+        this.company = company;
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -21,12 +22,12 @@ public class CompanyPrincipal implements UserDetails {
 
     @Override
     public String getPassword() {
-        return companyAdmin.getPassword();
+        return company.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return companyAdmin.getCompanyEmail();
+        return company.getCompanyEmail();
     }
 
     @Override
@@ -46,6 +47,6 @@ public class CompanyPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return company.isActive();
     }
 }
