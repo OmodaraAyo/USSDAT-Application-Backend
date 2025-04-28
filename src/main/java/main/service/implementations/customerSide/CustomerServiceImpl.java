@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CustomerServiceImpl implements CustomerServiceInterface{
+public class CustomerServiceImpl implements CustomerServiceInterface {
     @Autowired
     MenuRepo menuRepo;
 
@@ -27,13 +27,13 @@ public class CustomerServiceImpl implements CustomerServiceInterface{
     public FetchMenuResponse fetchMainMenu(FetchMenuRequest fetchMenuRequest) {
         try {
             validateRequest(fetchMenuRequest);
+            FetchMenuResponse response = new FetchMenuResponse();
+
             UserSession userSession = userSessionStore.getSession(fetchMenuRequest.getSessionId());
 
-            if ("99".equals(fetchMenuRequest.getResponse())) {
-                userSession.setCurrentPage(userSession.getCurrentPage() + 1);
-            } else if ("88".equals(fetchMenuRequest.getResponse()) && userSession.getCurrentPage() > 1) {
-                userSession.setCurrentPage(userSession.getCurrentPage() - 1);
-            }
+            int updatedPage = getUpdatedPage(fetchMenuRequest, userSession.getCurrentPage());
+            userSession.setCurrentPage(updatedPage);
+
 
             Menu mainMenu = fetchMenu(fetchMenuRequest.getSubCode());
             List<Option> options = mainMenu.getOptions();
@@ -43,17 +43,28 @@ public class CustomerServiceImpl implements CustomerServiceInterface{
             int endIndex = Math.min(startIndex + pageSize, totalOptions);
 
             if (startIndex >= totalOptions) {
-                return new FetchMenuResponse("No more options available.", false);
+                response.setMessage("No more options available.");
+                response.setHasMore(false);
+                response.setIsSuccess(false);
+                return response;
             }
 
             String menuText = buildMenuResponse(options, startIndex, endIndex, userSession.getCurrentPage(), totalOptions);
-            userSessionStore.saveSession(userSession);
-            return new FetchMenuResponse(menuText, true);
+            response.setMessage(menuText);
+            response.setHasMore(endIndex < totalOptions);
+            response.setPage(userSession.getCurrentPage());
+            response.setIsSuccess(true);
 
+            userSessionStore.saveSession(userSession);
+
+            return response;
+
+        } catch (InvalidRequest e) {
+            return createErrorResponse("Error: " + e.getMessage());
         } catch (MenuOptionNotFoundException e) {
-            return new FetchMenuResponse("Error: " + e.getMessage(), false);
+            return createErrorResponse("Error: " + e.getMessage());
         } catch (Exception e) {
-            return new FetchMenuResponse("An unexpected error occurred. Please try again.", false);
+            return createErrorResponse("An unexpected error occurred. Please try again.");
         }
     }
 
@@ -61,6 +72,14 @@ public class CustomerServiceImpl implements CustomerServiceInterface{
     public FetchMenuResponse fetchMenuFrmCompany(FetchMenuRequest fetchMenuRequest) {
         return null;
     }
+
+
+
+
+
+
+
+
 
 
 
@@ -76,19 +95,17 @@ public class CustomerServiceImpl implements CustomerServiceInterface{
                 .orElseThrow(() -> new MenuOptionNotFoundException("No menu available for this company"));
     }
 
-    private int getUpdatedPage(FetchMenuRequest request, int totalOptions, int pageSize) {
-        int currentPage = request.getPage() != null ? request.getPage() : 1;
-
-        if ("99".equals(request.getResponse()) && (currentPage * pageSize < totalOptions)) {
-            currentPage++;
+    private int getUpdatedPage(FetchMenuRequest request, int currentPage) {
+        if ("99".equals(request.getResponse())) {
+            return currentPage + 1;
         } else if ("88".equals(request.getResponse()) && currentPage > 1) {
-            currentPage--;
+            return currentPage - 1;
         }
         return currentPage;
     }
 
     private String buildMenuResponse(List<Option> options, int startIndex, int endIndex, int currentPage, int totalOptions) {
-        StringBuilder menuDetails = new StringBuilder(" Select an option:\n");
+        StringBuilder menuDetails = new StringBuilder("Select an option:\n");
 
         for (int i = startIndex; i < endIndex; i++) {
             menuDetails.append((i - startIndex) + 1).append(". ")
@@ -103,5 +120,13 @@ public class CustomerServiceImpl implements CustomerServiceInterface{
         }
 
         return menuDetails.toString();
+    }
+
+    private FetchMenuResponse createErrorResponse(String errorMessage) {
+        FetchMenuResponse response = new FetchMenuResponse();
+        response.setMessage(errorMessage);
+        response.setIsSuccess(false);
+        response.setHasMore(false);
+        return response;
     }
 }

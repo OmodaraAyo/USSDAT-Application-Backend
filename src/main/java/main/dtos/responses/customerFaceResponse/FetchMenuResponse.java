@@ -10,13 +10,13 @@ import java.util.List;
 
 @Data
 //@NoArgsConstructor
+//@AllArgsConstructor
 public class FetchMenuResponse {
     private String message;
     private String context;
     private Boolean hasMore;
     private List<UserOptions> options;
     private Integer page;
-
-    public FetchMenuResponse(String string, boolean b) {
-    }
+    private Boolean isSuccess;
 }
+

@@ -1,7 +1,8 @@
 package main.dtos.requests.customerFaceRequest;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
+//@AllArgsConstructor
 @Data
 public class FetchMenuRequest {
     private String sessionId;

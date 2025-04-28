@@ -15,4 +15,7 @@ public class Option {
     private String title;
     private String createdAt;
     private String updatedAt;
+
+//    public Option(String s) {
+//    }
 }

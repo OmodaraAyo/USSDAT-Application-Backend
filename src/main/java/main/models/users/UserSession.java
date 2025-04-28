@@ -10,7 +10,7 @@ public class UserSession {
     private Integer currentPage; 
     private String lastResponse;
 
-    public UserSession(String sessionId, String s, int i, String s1) {
-    }
+//    public UserSession(String sessionId, String s, int i, String s1) {
+//    }
 }
 
