@@ -44,7 +44,9 @@ class CustomerServiceImplTest {
 
         Menu menu = new Menu();
         List<Option> options = Arrays.asList(
-                new Option("Option 1"), new Option("Option 2"), new Option("Option 3")
+                createOption("menu123", "opt1", "Option 1", "2023-04-06", "2023-04-06"),
+                createOption("menu123", "opt2", "Option 2", "2023-04-06", "2023-04-06"),
+                createOption("menu123", "opt3", "Option 3", "2023-04-06", "2023-04-06")
         );
         menu.setOptions(options);
 

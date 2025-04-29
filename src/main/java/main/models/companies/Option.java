@@ -16,6 +16,4 @@ public class Option {
     private String createdAt;
     private String updatedAt;
 
-//    public Option(String s) {
-//    }
 }

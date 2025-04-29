@@ -1,4 +1,4 @@
-package main.dtos.responses;
+package main.dtos.requests.companyFaceRequest;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,9 +7,7 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class ApiResponse<T> {
-    private String message;
-    private T data;
+@Getter @Setter
+public class CompanyMenuOptionRequest {
+    private String companyId;
 }
