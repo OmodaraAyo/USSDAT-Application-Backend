@@ -1,11 +1,11 @@
 package main.controllers;
 
 import jakarta.validation.Valid;
-import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.LoginRequest;
-import main.dtos.responses.ApiResponse;
-import main.dtos.responses.CompanyResponse;
-import main.dtos.responses.LoginResponse;
+import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.responses.companyFaceResponse.ApiResponse;
+import main.dtos.responses.companyFaceResponse.CompanyResponse;
+import main.dtos.responses.companyFaceResponse.LoginResponse;
 import main.service.interfaces.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

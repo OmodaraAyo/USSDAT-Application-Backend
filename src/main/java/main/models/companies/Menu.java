@@ -16,7 +16,7 @@ public class Menu {
     private String companyId;
     @Id
     private String id;
-//    @Setter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private List<Option> options = new ArrayList<>();
     private String createdAt;
     private String updatedAt;

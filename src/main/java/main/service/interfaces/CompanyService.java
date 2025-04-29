@@ -1,14 +1,17 @@
 package main.service.interfaces;
 
-import main.dtos.requests.*;
-import main.dtos.responses.DeleteResponse;
-import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.responses.LoginResponse;
-import main.dtos.responses.LogoutResponse;
-import main.dtos.responses.CompanyResponse;
-import main.dtos.responses.ChangePasswordResponse;
-import main.dtos.responses.UpdateCompanyResponse;
-import main.models.users.Company;
+import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
+import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
+import main.dtos.responses.companyFaceResponse.DeleteResponse;
+import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
+import main.dtos.responses.companyFaceResponse.LoginResponse;
+import main.dtos.responses.companyFaceResponse.LogoutResponse;
+import main.dtos.responses.companyFaceResponse.CompanyResponse;
+import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
+import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
+import main.models.companies.Company;
 
 import java.util.List;
 
@@ -16,10 +19,21 @@ public interface CompanyService {
 
     CompanyResponse registerCompany(CompanyRequest companyRequest);
     LoginResponse signIn(LoginRequest loginRequest);
+
+    CompanyResponse registerCompany(CompanyRequest companyRequest);
+
+    LoginResponse signIn(LoginRequest loginRequest);
+
     CompanyDetailsResponse findCompanyById(String id);
     CompanyDetailsResponse findCompanyByEmail(String companyEmail);
     UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest);
+
+    UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest);
+
     ChangePasswordResponse resetPassword(ChangePasswordRequest request);
+
+    ChangePasswordResponse resetPassword(ChangePasswordRequest request);
+
     LogoutResponse logOut();
     DeleteResponse deleteById();
     List<Company> getAllCompanies();
