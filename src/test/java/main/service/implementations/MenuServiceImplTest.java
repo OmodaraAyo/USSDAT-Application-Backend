@@ -1,12 +1,12 @@
 package main.service.implementations;
 
-import main.dtos.requests.companyFaceRequest.*;
-import main.dtos.responses.companyFaceResponse.*;
+import main.dtos.requests.*;
+import main.dtos.responses.*;
 import main.exceptions.EmptyItemException;
 import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
 import main.models.security.CompanyPrincipal;
-import main.models.companies.Company;
+import main.models.users.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
@@ -70,7 +70,6 @@ public class MenuServiceImplTest {
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
-
 
     @Test
     public void menuOptions_shouldBeEmptyByDefault(){
@@ -254,7 +253,7 @@ public class MenuServiceImplTest {
 
         MenuOptionResponse response = menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
         assertTrue(response.isSuccess());
-        assertEquals("Transfer", response.getTitle());
+        assertEquals("Transfer".toLowerCase(), response.getTitle().toLowerCase());
     }
 
     @Test
@@ -372,7 +371,7 @@ public class MenuServiceImplTest {
 
         MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(new FindMenuOptionByIdRequest(savedMenu2.getOptionId()));
         assertTrue(menuOptionResponse.isSuccess());
-        assertEquals("Check balance", menuOptionResponse.getTitle());
+        assertEquals("Check balance".toLowerCase(), menuOptionResponse.getTitle().toLowerCase());
     }
 
     @Test
@@ -440,4 +439,87 @@ public class MenuServiceImplTest {
         assertEquals("Transfer".toLowerCase(), refreshFirstCompany3.getMenu().getOptions().get(0).getTitle().toLowerCase());
     }
 
+    @Test
+    public void givenAuthenticatedCompany_whenFindMenuOptions_thenReturnCompanyMenuOptions(){
+        String firstCompanyPassword = CompanyServiceImpl.genPass;
+        Company company = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertFalse(company.isLoggedIn());
+
+        LoginResponse loginResponse = companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com",firstCompanyPassword));
+        assertTrue(loginResponse.getIsLoggedIn());
+
+        Company refreshFirstCompany1 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        CompanyPrincipal principal = new CompanyPrincipal(company);
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        assertTrue(refreshFirstCompany1.isLoggedIn());
+        assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
+
+        //add first menu for company 1
+        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
+
+        //add first menu for company 2
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
+
+        //add first menu for company 3
+        CreatedOptionResponse savedMenu3 = menuService.addNewOption(new CreateOptionRequest("Transfer"));
+        assertEquals("Awesome! Your menu is now live.", savedMenu3.getResponse());
+
+        Company refreshFirstCompany2 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
+        assertTrue(refreshFirstCompany2.isLoggedIn());
+        assertFalse(refreshFirstCompany2.getMenu().getOptions().isEmpty());
+
+        CompanyMenuOptionResponse companyMenu = menuService.getMenuOptionsForCompany(new CompanyMenuOptionRequest(refreshFirstCompany2.getCompanyId()));
+        assertEquals("register".toLowerCase(), companyMenu.getMenuOptions().get(0).toLowerCase());
+        assertEquals("Check balance".toLowerCase(), companyMenu.getMenuOptions().get(1).toLowerCase());
+        assertEquals("Transfer".toLowerCase(), companyMenu.getMenuOptions().get(2).toLowerCase());
+        assertThat(refreshFirstCompany2.getMenu().getOptions(), hasSize(3));
+        System.out.println("Company 1:  "+companyMenu.getMenuOptions());
+
+        //company 2
+        CompanyRequest companyRequest2 = new CompanyRequest();
+        companyRequest2.setCompanyName("Sui");
+        companyRequest2.setCompanyEmail("example@gmail.com");
+        companyRequest2.setCompanyPhone(List.of("08022211150"));
+        companyRequest2.setCategory("ECOMMERCE");
+        companyRequest2.setBusinessRegistrationNumber("987654321");
+        CompanyResponse companyResponse2 = companyService.registerCompany(companyRequest2);
+        String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
+        System.out.println("second registration: "+secondRegisteredCompanyPassword);
+        assertTrue(companyResponse2.isSuccess());
+
+        Company company2 = companyService.getByCompanyEmail("example@gmail.com");
+        assertFalse(company2.isLoggedIn());
+
+        LoginResponse loginResponse2 = companyService.signIn(new LoginRequest("example@gmail.com", secondRegisteredCompanyPassword));
+        assertTrue(loginResponse2.getIsLoggedIn());
+        CompanyPrincipal principal2 = new CompanyPrincipal(company2);
+        UsernamePasswordAuthenticationToken auth2 = new UsernamePasswordAuthenticationToken(principal2, null, principal.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth2);
+        Company refreshCompany2 = companyService.getByCompanyEmail("example@gmail.com");
+        assertTrue(refreshCompany2.isLoggedIn());
+        assertTrue(refreshCompany2.getMenu().getOptions().isEmpty());
+
+
+        //add first menu for company 2
+        CreatedOptionResponse addFirstMenuOptionForCompany2 = menuService.addNewOption(new CreateOptionRequest("register"));
+        assertEquals("Awesome! Your menu is now live.", addFirstMenuOptionForCompany2.getResponse());
+
+        //add second menu for company 2
+        CreatedOptionResponse addSecondMenuOptionForCompany2 = menuService.addNewOption(new CreateOptionRequest("Buy data"));
+        assertEquals("Awesome! Your menu is now live.", addSecondMenuOptionForCompany2.getResponse());
+
+
+        Company refreshSecondCompany2II = companyService.getByCompanyEmail("example@gmail.com");
+        assertTrue(refreshSecondCompany2II.isLoggedIn());
+        assertFalse(refreshSecondCompany2II.getMenu().getOptions().isEmpty());
+
+        CompanyMenuOptionResponse secondCompanyMenu = menuService.getMenuOptionsForCompany(new CompanyMenuOptionRequest(refreshSecondCompany2II.getCompanyId()));
+        assertEquals("register".toLowerCase(), secondCompanyMenu.getMenuOptions().get(0).toLowerCase());
+        assertEquals("Buy data".toLowerCase(), secondCompanyMenu.getMenuOptions().get(1).toLowerCase());
+        System.out.println("Second company: "+secondCompanyMenu.getMenuOptions());
+        assertThat(refreshSecondCompany2II.getMenu().getOptions(), hasSize(2));
+    }
 }

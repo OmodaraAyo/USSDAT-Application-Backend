@@ -1,21 +1,18 @@
 package main.service.implementations;
 
 import main.UssdAtApplication;
-import main.dtos.responses.companyFaceResponse.DeleteResponse;
-import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
-import main.dtos.requests.companyFaceRequest.LoginRequest;
-import main.dtos.responses.companyFaceResponse.LoginResponse;
-import main.dtos.responses.companyFaceResponse.LogoutResponse;
-import main.dtos.requests.companyFaceRequest.CompanyRequest;
-import main.dtos.responses.companyFaceResponse.CompanyResponse;
-import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
-import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
-import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
-import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
+import main.dtos.requests.*;
+import main.dtos.responses.DeleteResponse;
+import main.dtos.responses.CompanyDetailsResponse;
+import main.dtos.responses.LoginResponse;
+import main.dtos.responses.LogoutResponse;
+import main.dtos.responses.CompanyResponse;
+import main.dtos.responses.ChangePasswordResponse;
+import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.security.CompanyPrincipal;
-import main.models.companies.Company;
+import main.models.users.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.CompanyRepo;
 import main.service.interfaces.CompanyService;
@@ -65,6 +62,7 @@ public class CompanyServiceImplTest {
         companyRequest.setCompanyPhone(List.of("09012345678"));
         companyRequest.setCategory("finance");
         companyRequest.setBusinessRegistrationNumber("123456789");
+        companyRequest.setBaseUrl("https://test@gmail.com");
         companyResponse = companyService.registerCompany(companyRequest);
     }
 
@@ -449,7 +447,7 @@ public class CompanyServiceImplTest {
 //        assertEquals("Password changed successfully", request.getMessage());
 //        assertTrue(refreshCompany.isLoggedIn());
 //
-////        companyService.addMenu(new MenuRequest("register"));
+//        companyService.addMenu(new MenuRequest("register"));
 //
 //    }
 

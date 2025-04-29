@@ -2,22 +2,19 @@ package main.service.implementations;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
-import main.dtos.responses.companyFaceResponse.DeleteResponse;
-import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
-import main.dtos.requests.companyFaceRequest.LoginRequest;
-import main.dtos.responses.companyFaceResponse.LoginResponse;
-import main.dtos.responses.companyFaceResponse.LogoutResponse;
-import main.dtos.requests.companyFaceRequest.CompanyRequest;
-import main.dtos.responses.companyFaceResponse.CompanyResponse;
-import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
-import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
-import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
-import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
+import main.dtos.requests.*;
+import main.dtos.responses.DeleteResponse;
+import main.dtos.responses.CompanyDetailsResponse;
+import main.dtos.responses.LoginResponse;
+import main.dtos.responses.LogoutResponse;
+import main.dtos.responses.CompanyResponse;
+import main.dtos.responses.ChangePasswordResponse;
+import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.enums.Role;
-import main.models.companies.Company;
-import main.models.companies.Menu;
+import main.models.users.Company;
+import main.models.users.Menu;
 import main.repositories.CompanyRepo;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
@@ -133,6 +130,8 @@ public class CompanyServiceImpl implements CompanyService {
 
         currentLoggedInCompany.setLoggedIn(false);
         companyRepo.save(currentLoggedInCompany);
+
+
         return new LogoutResponse("Logout successful");
     }
 
@@ -282,7 +281,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createLoginResponseWithoutWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
         loginResponse.setResponse("Login Successful");
         loginResponse.setIsLoggedIn(true);
         loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());
@@ -291,7 +290,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createFirstLoginResponseWithWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
         loginResponse.setResponse("Login Successful");
         loginResponse.setWarning("Your default password is temporary and expires after first use. Please set a new password.");
         loginResponse.setIsLoggedIn(true);
@@ -312,7 +311,7 @@ public class CompanyServiceImpl implements CompanyService {
         Company newCompany = createNewCompany(companyRequest, generatedPassword);
         Company savedCompany = saveNewCompany(newCompany);
 
-//        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
+        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
         return new CompanyResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
     }
 
@@ -326,6 +325,7 @@ public class CompanyServiceImpl implements CompanyService {
         newCompany.setUssdShortCode(generateUssdCode());
         newCompany.setBusinessRegistrationNumber(companyRequest.getBusinessRegistrationNumber());
         newCompany.setCategory(Category.getCategory(companyRequest.getCategory()));
+        newCompany.setBaseUrl(companyRequest.getBaseUrl());
         newCompany.setRole(Role.ADMIN);
         newCompany.setMenu(menuRepo.save(new Menu()));
         newCompany.setCreateAt(DateUtil.getCurrentDate());

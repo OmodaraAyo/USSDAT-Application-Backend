@@ -3,6 +3,7 @@ package main.service.implementations;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import main.service.interfaces.EmailService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ import org.springframework.stereotype.Service;
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender mailSender;
+
+    @Value("${spring.mail.username}")
+    private String fromEmailId;
 
     public EmailServiceImpl(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -21,17 +25,12 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(String registeredCompanyEmail, String generatedPassword) {
         try{
             MimeMessage mimeMessage = mailSender.createMimeMessage();
-            mimeMessage.setFrom(new InternetAddress("backwyth@gmail.com"));
+            mimeMessage.setFrom(new InternetAddress("support@backwyth.com"));
             mimeMessage.setRecipients(MimeMessage.RecipientType.TO, registeredCompanyEmail);
             mimeMessage.setSubject("Welcome to Backwyth - Your USSD Gateway Starts Here");
 
             String htmlContent ="<!DOCTYPE html"+
-                    "<html>" +
-                        "<head>"+
-                                "<meta charset='UTF-8'>"+
-                                "<title>Welcome to Backwyth</title>"+
-                        "</head>"+
-                            "<body>"+
+                    "<html><head><meta charset='UTF-8'><title>Welcome to Backwyth</title></head><body>"+
                                 "<p>Hey there,</p>"+
                                 "<p>Thanks for registering with Backwyth! We're excited to have your company onboard, Backwyth is your one-stop platform for managing USSD menus with ease, a powerful control and smooth integration. With Backwyth, your company can effortlessly build, customize, and deploy USSD menus without worrying about telecom complexity.</p>"+
                                 "<p>Here's what you get access to on Backwyth:</p>"+
@@ -47,12 +46,11 @@ public class EmailServiceImpl implements EmailService {
                                 "<p><strong>Username: </strong>"+ registeredCompanyEmail + "</p>"+
                                 "<p><strong>Password: </strong>"+ generatedPassword +"</p>"+
                                 "<p>We recommend logging in immediately and updating your password.</p>"+
-                                "<p>Log in at: <a href=\"https://github.com/Backwyth/Backwyth/releases\">https://github.com/Backwyth/Backwyth/releases</a></p>"+
+                                "<p>Log in at: <a href=\"https://github.com/Backwyth/Backwyth/releases\" target=\"_blank\">https://github.com/Backwyth/Backwyth/releases</a></p>"+
                                 "<p>Need help getting started? Check out our <a href=\"https://github.com/Backwyth/Backwyth/Docs\">Docs</a> or reach out to our team- we're here to support you.</p>"+
                                 "<p>Welcome aboard,</p>"+
                                 "<p><strong>The Backwyth Team.</strong></p>"+
-                            "</body>"+
-                    "</html>";
+                            "</body></html>";
             mimeMessage.setContent(htmlContent, "text/html; charset=utf-8");
             mailSender.send(mimeMessage);
         }catch (Exception e){
@@ -61,12 +59,3 @@ public class EmailServiceImpl implements EmailService {
     }
 
 }
-
-
-//    private final Environment environment;
-//            for(String profile : environment.getActiveProfiles()){
-//                if(profile.equalsIgnoreCase("test")){
-//                    System.out.println("TEST PROFILE- Email not sent");
-//                    return;
-//                }
-//            }
