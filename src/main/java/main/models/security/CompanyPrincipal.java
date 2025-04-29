@@ -1,6 +1,6 @@
 package main.models.security;
 
-import main.models.users.Company;
+import main.models.companies.Company;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

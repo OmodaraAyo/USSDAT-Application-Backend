@@ -1,12 +1,12 @@
 package main.exceptions;
 
 
-import main.dtos.requests.CompanyRequest;
-import main.dtos.requests.CreateOptionRequest;
-import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.models.enums.Category;
-import main.models.users.Company;
-import main.models.users.Option;
+import main.models.companies.Company;
+import main.models.companies.Option;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.List;
