@@ -19,21 +19,10 @@ public interface CompanyService {
 
     CompanyResponse registerCompany(CompanyRequest companyRequest);
     LoginResponse signIn(LoginRequest loginRequest);
-
-    CompanyResponse registerCompany(CompanyRequest companyRequest);
-
-    LoginResponse signIn(LoginRequest loginRequest);
-
     CompanyDetailsResponse findCompanyById(String id);
     CompanyDetailsResponse findCompanyByEmail(String companyEmail);
     UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest);
-
-    UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest);
-
     ChangePasswordResponse resetPassword(ChangePasswordRequest request);
-
-    ChangePasswordResponse resetPassword(ChangePasswordRequest request);
-
     LogoutResponse logOut();
     DeleteResponse deleteById();
     List<Company> getAllCompanies();
