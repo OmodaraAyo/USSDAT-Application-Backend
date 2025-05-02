@@ -99,4 +99,13 @@ public class ValidatorException extends RuntimeException {
             }
         }
     }
+
+    public static void validateId(String companyId, String companyId1) {
+        if(companyId == null || companyId1.isEmpty() || companyId.trim().isEmpty()){
+            throw new ValidatorException("Company id is required");
+        }
+        if(!companyId.equals(companyId1)){
+            throw new ValidatorException("Id mismatch");
+        }
+    }
 }

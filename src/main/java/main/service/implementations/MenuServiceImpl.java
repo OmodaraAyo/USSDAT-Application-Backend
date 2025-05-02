@@ -1,5 +1,6 @@
 package main.service.implementations;
 
+import main.dtos.requests.DeleteMenuOptionRequest;
 import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
@@ -38,8 +39,9 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public CreatedOptionResponse addNewOption(CreateOptionRequest optionRequest) {
+    public CreatedOptionResponse addNewOption(String companyId,  CreateOptionRequest optionRequest) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         ValidatorException.validateOptionRequest(optionRequest.getTitle());
         ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
         String generatedOptionId = generateOptionId();
@@ -57,50 +59,55 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public MenuOptionResponse getMenuOptionByTitle(MenuOptionRequest menuOptionRequest) {
+    public MenuOptionResponse getMenuOptionByTitle(String companyId, String title) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
-        return getAuthenticatedCompanyOptionByTitle(activeCompanySession, menuOptionRequest.getMenuTitle());
+        return getAuthenticatedCompanyOptionByTitle(activeCompanySession, title);
     }
 
     @Override
-    public DeleteMenuOptionResponse deleteMenuOptionById(String menuId) {
+    public DeleteMenuOptionResponse deleteMenuOptionById(String companyId, String optionId) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
-        return deleteMenu(activeCompanySession, menuId);
+        return deleteMenu(activeCompanySession, optionId);
     }
 
     @Override
-    public MenuOptionResponse getMenuOptionById(FindMenuOptionByIdRequest request) {
+    public MenuOptionResponse getMenuOptionById(String companyId, String optionId) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
-        return getAuthenticatedCompanyMenuOptionById(activeCompanySession, request.getOptionId());
+        return getAuthenticatedCompanyMenuOptionById(activeCompanySession, optionId);
     }
 
     @Override
-    public UpdateOptionResponse updateMenuOption(UpdateOptionRequest updateOptionRequest) {
+    public UpdateOptionResponse updateMenuOption(String companyId, String optionId, UpdateOptionRequest updateOptionRequest) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
-        return updatedOptionResponse(activeCompanySession, updateOptionRequest);
+        return updatedOptionResponse(activeCompanySession, optionId, updateOptionRequest);
     }
 
     @Override
-    public CompanyMenuOptionResponse getMenuOptionsForCompany(CompanyMenuOptionRequest companyMenuOptionRequest) {
-        Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-        checkIfActiveCompanySessionHaveAMenu(company.getMenu().getOptions());
-        CompanyMenuOptionResponse companyMenuOptionResponse = new CompanyMenuOptionResponse();
-        for(Option option : company.getMenu().getOptions()){
-            companyMenuOptionResponse.getMenuOptions().add(option.getTitle());
+    public CompanyMenuOptionsResponse getMenuOptionsForCompany(String companyMenuOptionsRequest) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyMenuOptionsRequest, activeCompanySession.getCompanyId());
+        checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        CompanyMenuOptionsResponse companyMenuOptionsResponse = new CompanyMenuOptionsResponse();
+        for(Option option : activeCompanySession.getMenu().getOptions()){
+            companyMenuOptionsResponse.getMenuOptions().add(option.getTitle());
         }
-        return companyMenuOptionResponse;
+        return companyMenuOptionsResponse;
     }
 
-    private UpdateOptionResponse updatedOptionResponse(Company activeCompanySession, UpdateOptionRequest updateOptionRequest) {
-        Option thisOption = fetchMenuById(activeCompanySession, updateOptionRequest.getOptionId());
+    private UpdateOptionResponse updatedOptionResponse(Company activeCompanySession, String optionId, UpdateOptionRequest updateOptionRequest) {
+        Option thisOption = fetchMenuById(activeCompanySession, optionId);
         assert thisOption != null;
         thisOption.setTitle(updateOptionRequest.getNewOptionName());
         thisOption.setUpdatedAt(DateUtil.getCurrentDate());
-        updateOption(thisOption, activeCompanySession.getMenu().getOptions(), updateOptionRequest.getOptionId());
+        updateOption(thisOption, activeCompanySession.getMenu().getOptions(), optionId);
         menuRepo.save(activeCompanySession.getMenu());
         companyUpdateSaver.saveUpdatedCompany(activeCompanySession);
         return new UpdateOptionResponse(thisOption.getOptionId(), true, DateUtil.getCurrentDate());

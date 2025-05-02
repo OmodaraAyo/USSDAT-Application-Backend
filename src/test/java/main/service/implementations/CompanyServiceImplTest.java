@@ -5,7 +5,7 @@ import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
 import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.LoginRequest;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
-import main.dtos.responses.companyFaceResponse.DeleteResponse;
+import main.dtos.responses.companyFaceResponse.DeleteCompanyAccountResponse;
 import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
 import main.dtos.responses.companyFaceResponse.LoginResponse;
 import main.dtos.responses.companyFaceResponse.LogoutResponse;
@@ -324,7 +324,7 @@ public class CompanyServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        CompanyDetailsResponse companyDetailsRequest = companyService.findCompanyById();
+        CompanyDetailsResponse companyDetailsRequest = companyService.findCompanyById(company.getCompanyId());
         assertEquals("Unius".toLowerCase(), companyDetailsRequest.getCompanyName());
         assertEquals("123456789".toLowerCase(), companyDetailsRequest.getBusinessRegistrationNumber());
         assertEquals("ayodeleomodara1234@gmail.com".toLowerCase(), companyDetailsRequest.getCompanyEmail().toLowerCase());
@@ -346,7 +346,7 @@ public class CompanyServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        ChangePasswordResponse request = companyService.resetPassword(company.getCompanyId(),new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
         assertEquals("Password changed successfully", request.getMessage());
         assertTrue(company.isLoggedIn());
 
@@ -355,11 +355,11 @@ public class CompanyServiceImplTest {
         updateRequest.getCompanyRequest().setCategory("FINANCE");
         updateRequest.getCompanyRequest().setCompanyApiKey("T9uO8N4v1GZrWQX9F2lRA2J7oTxkCWy6G9gO2A7GJvLkN2vEr3nE9QjV7Q0e3lKpFeXvQ0L1OZoQmQkz009xYtFAK");
         updateRequest.getCompanyRequest().setBaseUrl("https://api.example.com/");
-        UpdateCompanyResponse updatedCompany = companyService.updateCompanyDetails(updateRequest);
+        UpdateCompanyResponse updatedCompany = companyService.updateCompanyDetails(company.getCompanyId(),updateRequest);
         assertEquals("Updated Successfully", updatedCompany.getMessage());
         assertTrue(company.isLoggedIn());
 
-        LogoutResponse response = companyService.logOut();
+        LogoutResponse response = companyService.logOut(company.getCompanyId());
         assertEquals("Logout successful", response.getMessage());
         Company refreshedCompany = companyRepo.findByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertFalse(refreshedCompany.isLoggedIn());
@@ -369,7 +369,7 @@ public class CompanyServiceImplTest {
     public void shouldRejectUpdateWhenUserIsUnauthenticated(){
         assertFalse(signUpResponse.isIsLoggedIn());
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            companyService.resetPassword(new ChangePasswordRequest("wagwan1234", "Ayodele01$"));
+            companyService.resetPassword("1234567", new ChangePasswordRequest("wagwan1234", "Ayodele01$"));
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
@@ -411,11 +411,11 @@ public class CompanyServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        ChangePasswordResponse request = companyService.resetPassword(new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        ChangePasswordResponse request = companyService.resetPassword(refreshCompany.getCompanyId(), new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
         assertEquals("Password changed successfully", request.getMessage());
         assertTrue(refreshCompany.isLoggedIn());
 
-        DeleteResponse response = companyService.deleteById();
+        DeleteCompanyAccountResponse response = companyService.deactivateCompany(refreshCompany.getCompanyId());
         assertEquals("Account closed successfully", response.getMessage());
         assertTrue(response.isSuccess());
 

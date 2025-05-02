@@ -8,6 +8,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class CompanyMenuOptionRequest {
+public class CompanyMenuOptionsRequest {
     private String companyId;
 }
