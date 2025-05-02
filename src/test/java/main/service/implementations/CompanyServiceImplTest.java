@@ -1,7 +1,6 @@
 package main.service.implementations;
 
 import main.UssdAtApplication;
-import main.dtos.requests.*;
 import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
 import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.LoginRequest;

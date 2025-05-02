@@ -2,17 +2,8 @@ package main.service.implementations;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
-import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
-import main.dtos.requests.companyFaceRequest.LoginRequest;
-import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
-import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
-import main.dtos.responses.companyFaceResponse.DeleteResponse;
-import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
-import main.dtos.responses.companyFaceResponse.LoginResponse;
-import main.dtos.responses.companyFaceResponse.LogoutResponse;
-import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
-import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
-import main.dtos.responses.companyFaceResponse.CompanySignUpResponse;
+import main.dtos.requests.companyFaceRequest.*;
+import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.ValidatorException;
 import main.models.companies.Company;
 import main.models.companies.Menu;
@@ -21,6 +12,8 @@ import main.models.enums.Role;
 import main.repositories.CompanyRepo;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
+import main.service.interfaces.EmailService;
+import main.service.interfaces.MenuService;
 import main.utils.DateUtil;
 import main.utils.GeneratorUtil;
 import main.utils.UssdCounterUtil;
@@ -45,13 +38,13 @@ public class CompanyServiceImpl implements CompanyService {
     private UssdCounterUtil ussdCounterUtil;
 
     @Autowired
-    private EmailServiceImpl emailServiceImpl;
+    private EmailService emailServiceImpl;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private MenuRepo menuRepo;
+    private MenuService menuService;
 
     @Autowired
     private JWTService jwtService;
@@ -330,7 +323,7 @@ public class CompanyServiceImpl implements CompanyService {
         newCompany.setBusinessRegistrationNumber(companySignUpRequest.getBusinessRegistrationNumber());
         newCompany.setCategory(Category.getCategory(companySignUpRequest.getCategory()));
         newCompany.setRole(Role.ADMIN);
-        newCompany.setMenu(menuRepo.save(new Menu()));
+        newCompany.setMenu(menuService.createDefaultMenu());
         newCompany.setCreateAt(DateUtil.getCurrentDate());
         newCompany.setUpdateAt(DateUtil.getCurrentDate());
         newCompany.setActive(true);

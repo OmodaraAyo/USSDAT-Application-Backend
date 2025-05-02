@@ -5,10 +5,11 @@ import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
 import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
+import main.helper.CompanyUpdateSaver;
 import main.models.companies.Company;
+import main.models.companies.Menu;
 import main.models.companies.Option;
 import main.repositories.MenuRepo;
-import main.service.interfaces.CompanyService;
 import main.service.interfaces.MenuService;
 import main.utils.DateUtil;
 import org.bson.types.ObjectId;
@@ -21,7 +22,7 @@ import java.util.List;
 public class MenuServiceImpl implements MenuService {
 
     @Autowired
-    private CompanyService companyService;
+    private CompanyUpdateSaver companyUpdateSaver;
 
     @Autowired
     private MenuRepo menuRepo;
@@ -29,6 +30,12 @@ public class MenuServiceImpl implements MenuService {
     @Autowired
     private AuthenticatedCompanyService authenticatedCompanyService;
 
+
+    @Override
+    public Menu createDefaultMenu() {
+        menuRepo.save(new Menu());
+        return null;
+    }
 
     @Override
     public CreatedOptionResponse addNewOption(CreateOptionRequest optionRequest) {
@@ -95,7 +102,7 @@ public class MenuServiceImpl implements MenuService {
         thisOption.setUpdatedAt(DateUtil.getCurrentDate());
         updateOption(thisOption, activeCompanySession.getMenu().getOptions(), updateOptionRequest.getOptionId());
         menuRepo.save(activeCompanySession.getMenu());
-        companyService.saveCompany(activeCompanySession);
+        companyUpdateSaver.saveUpdatedCompany(activeCompanySession);
         return new UpdateOptionResponse(thisOption.getOptionId(), true, DateUtil.getCurrentDate());
     }
 
@@ -123,7 +130,7 @@ public class MenuServiceImpl implements MenuService {
             option.setUpdatedAt(DateUtil.getCurrentDate());
             activeCompanySession.getMenu().getOptions().add(option);
             menuRepo.save(activeCompanySession.getMenu());
-            return companyService.saveCompany(activeCompanySession);
+            return companyUpdateSaver.saveUpdatedCompany(activeCompanySession);
         } catch (Exception e) {
             throw new RuntimeException("Unable to create new option: "+e+ " Please try again!");
         }
