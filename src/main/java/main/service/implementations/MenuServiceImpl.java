@@ -37,7 +37,16 @@ public class MenuServiceImpl implements MenuService {
         ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
         String generatedOptionId = generateOptionId();
         Company savedCompany = createNewOption(activeCompanySession, optionRequest, generatedOptionId);
-        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
+
+        CreatedOptionResponse createdOptionResponse = new CreatedOptionResponse();
+        createdOptionResponse.setCompanyId(savedCompany.getCompanyId());
+        createdOptionResponse.setMenuId(savedCompany.getMenu().getId());
+        createdOptionResponse.setOptionId(generatedOptionId);
+        createdOptionResponse.setTitle(optionRequest.getTitle());
+        createdOptionResponse.setResponse("Awesome! Your menu is now live.");
+        createdOptionResponse.setSuccess(true);
+        return createdOptionResponse;
+//        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
     }
 
     @Override

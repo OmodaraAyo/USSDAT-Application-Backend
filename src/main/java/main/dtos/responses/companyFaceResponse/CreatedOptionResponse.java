@@ -12,7 +12,9 @@ import lombok.Setter;
 public class CreatedOptionResponse {
     private String companyId;
     private String menuId;
+    private String title;
     private String optionId;
     private String response;
     private boolean isSuccess;
+
 }
