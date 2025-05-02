@@ -1,13 +1,16 @@
 package main.dtos.responses.companyFaceResponse;
 
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-@ToString
-public class SignUpResponse {
+public class CompanySignUpResponse {
     private String message;
     private String id;
     private boolean isSuccess;

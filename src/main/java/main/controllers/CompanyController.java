@@ -1,12 +1,12 @@
 package main.controllers;
 
 import jakarta.validation.Valid;
-import main.dtos.requests.SignUpRequest;
-import main.dtos.requests.LoginRequest;
-import main.dtos.responses.ApiResponse;
-import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.responses.SignUpResponse;
-import main.dtos.responses.LoginResponse;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.responses.companyFaceResponse.ApiResponse;
+import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
+import main.dtos.responses.companyFaceResponse.LoginResponse;
+import main.dtos.responses.companyFaceResponse.CompanySignUpResponse;
 import main.service.interfaces.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,9 +21,9 @@ public class CompanyController {
     private CompanyService companyService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<SignUpResponse>> registerNewCompany(@Valid @RequestBody SignUpRequest signUpRequest) {
+    public ResponseEntity<ApiResponse<CompanySignUpResponse>> registerNewCompany(@Valid @RequestBody CompanySignUpRequest companySignUpRequest) {
 
-        SignUpResponse registeredCompany = companyService.registerCompany(signUpRequest);
+        CompanySignUpResponse registeredCompany = companyService.registerCompany(companySignUpRequest);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", registeredCompany));
     }
 

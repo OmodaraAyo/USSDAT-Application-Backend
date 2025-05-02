@@ -1,20 +1,18 @@
 package main.service.interfaces;
 
-import main.dtos.requests.*;
-import main.dtos.responses.DeleteResponse;
-import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.responses.LoginResponse;
-import main.dtos.responses.LogoutResponse;
-import main.dtos.responses.SignUpResponse;
-import main.dtos.responses.ChangePasswordResponse;
-import main.dtos.responses.UpdateCompanyResponse;
-import main.models.users.Company;
+import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
+import main.dtos.responses.companyFaceResponse.*;
+import main.models.companies.Company;
+
 
 import java.util.List;
 
 public interface CompanyService {
 
-    SignUpResponse registerCompany(SignUpRequest signUpRequest);
+    CompanySignUpResponse registerCompany(CompanySignUpRequest companySignUpRequest);
     LoginResponse signIn(LoginRequest loginRequest);
     CompanyDetailsResponse findCompanyById();
     CompanyDetailsResponse findCompanyByEmail(String companyEmail);

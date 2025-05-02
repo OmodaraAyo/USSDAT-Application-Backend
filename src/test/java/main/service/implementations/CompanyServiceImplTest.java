@@ -2,17 +2,21 @@ package main.service.implementations;
 
 import main.UssdAtApplication;
 import main.dtos.requests.*;
-import main.dtos.responses.DeleteResponse;
-import main.dtos.responses.CompanyDetailsResponse;
-import main.dtos.responses.LoginResponse;
-import main.dtos.responses.LogoutResponse;
-import main.dtos.responses.SignUpResponse;
-import main.dtos.responses.ChangePasswordResponse;
-import main.dtos.responses.UpdateCompanyResponse;
+import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
+import main.dtos.responses.companyFaceResponse.DeleteResponse;
+import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
+import main.dtos.responses.companyFaceResponse.LoginResponse;
+import main.dtos.responses.companyFaceResponse.LogoutResponse;
+import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
+import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
+import main.dtos.responses.companyFaceResponse.CompanySignUpResponse;
 import main.exceptions.ValidatorException;
 import main.models.enums.Category;
 import main.models.security.CompanyPrincipal;
-import main.models.users.Company;
+import main.models.companies.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.CompanyRepo;
 import main.service.interfaces.CompanyService;
@@ -47,7 +51,7 @@ public class CompanyServiceImplTest {
     @Autowired
     private CompanyService companyService;
 
-    private SignUpResponse signUpResponse;
+    private CompanySignUpResponse signUpResponse;
 
     @BeforeEach
     public void startAllWithThis(){
@@ -56,7 +60,7 @@ public class CompanyServiceImplTest {
         Update update = new Update().set("ussdCode", 1);
         mongoTemplate.upsert(query, update, UssdCounter.class);
 
-        SignUpRequest signUpRequest = new SignUpRequest();
+        CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
         signUpRequest.setCompanyName("Unius");
         signUpRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
         signUpRequest.setCompanyPhone(List.of("09012345678"));
@@ -76,7 +80,7 @@ public class CompanyServiceImplTest {
     @Test
     public void shouldRejectCompanyName_withSpecialCharacters(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius@1");
             companyService.registerCompany(signUpRequest);
         });
@@ -84,7 +88,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("@@_#1");
             companyService.registerCompany(signUpRequest);
         });
@@ -97,7 +101,7 @@ public class CompanyServiceImplTest {
     public void shouldFailValidation_forInvalidEmail(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
 
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024gmail.com");
             companyService.registerCompany(signUpRequest);
@@ -107,7 +111,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius@gmail@gmail.com");
             companyService.registerCompany(signUpRequest);
@@ -119,7 +123,7 @@ public class CompanyServiceImplTest {
     @Test
     public void shouldFailValidation_forInvalidNigerianPhoneNumber(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("06123687901"));
@@ -129,7 +133,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("08083  352449"));
@@ -139,7 +143,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception3 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("08083  24  49"));
@@ -149,7 +153,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception4 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("080835@@24_-"));
@@ -159,7 +163,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception5 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("0+0835++24_-"));
@@ -169,7 +173,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception6 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("+80835352449"));
@@ -179,7 +183,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception7 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("+23480"));
@@ -189,7 +193,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception8 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("Abcdefghijk"));
@@ -202,7 +206,7 @@ public class CompanyServiceImplTest {
     @Test
     public void shouldFailValidation_forInvalidCategory(){
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("08123687901"));
@@ -213,7 +217,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         ValidatorException exception2 = assertThrows(ValidatorException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("unius2024@gmail.com");
             signUpRequest.setCompanyPhone(List.of("08123687901"));
@@ -233,7 +237,7 @@ public class CompanyServiceImplTest {
         LoginResponse loginResponse= companyService.signIn(new LoginRequest("ayodeleomodara1234@gmail.com", firstRegisteredCompanyPassword));
         assertTrue(loginResponse.getIsLoggedIn());
 
-        SignUpRequest signUpRequest2 = new SignUpRequest();
+        CompanySignUpRequest signUpRequest2 = new CompanySignUpRequest();
         signUpRequest2.setCompanyName("Sui");
         signUpRequest2.setCompanyEmail("example@gmail.com");
         signUpRequest2.setCompanyPhone(List.of("08022211150"));
@@ -277,7 +281,7 @@ public class CompanyServiceImplTest {
     @Test
     public void shouldAllowCompanyToRegisterOnlyOnce(){
         RuntimeException exception  = assertThrows(RuntimeException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
             signUpRequest.setCompanyPhone(List.of("09012345678"));
@@ -289,7 +293,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         RuntimeException exception2  = assertThrows(RuntimeException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("BlueBirds");
             signUpRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
             signUpRequest.setCompanyPhone(List.of("09012345678"));
@@ -301,7 +305,7 @@ public class CompanyServiceImplTest {
         assertEquals(1, companyRepo.count());
 
         RuntimeException exception3  = assertThrows(RuntimeException.class, () -> {
-            SignUpRequest signUpRequest = new SignUpRequest();
+            CompanySignUpRequest signUpRequest = new CompanySignUpRequest();
             signUpRequest.setCompanyName("Unius");
             signUpRequest.setCompanyEmail("jpmorgan@gmail.com");
             signUpRequest.setCompanyPhone(List.of("08134128960", "09132457819"));

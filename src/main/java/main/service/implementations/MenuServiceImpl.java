@@ -1,12 +1,12 @@
 package main.service.implementations;
 
-import main.dtos.requests.*;
-import main.dtos.responses.*;
+import main.dtos.requests.companyFaceRequest.*;
+import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
 import main.exceptions.MenuOptionNotFoundException;
 import main.exceptions.ValidatorException;
-import main.models.users.Company;
-import main.models.users.Option;
+import main.models.companies.Company;
+import main.models.companies.Option;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
 import main.service.interfaces.MenuService;
@@ -37,7 +37,16 @@ public class MenuServiceImpl implements MenuService {
         ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
         String generatedOptionId = generateOptionId();
         Company savedCompany = createNewOption(activeCompanySession, optionRequest, generatedOptionId);
-        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
+
+        CreatedOptionResponse createdOptionResponse = new CreatedOptionResponse();
+        createdOptionResponse.setCompanyId(savedCompany.getCompanyId());
+        createdOptionResponse.setMenuId(savedCompany.getMenu().getId());
+        createdOptionResponse.setOptionId(generatedOptionId);
+        createdOptionResponse.setTitle(optionRequest.getTitle());
+        createdOptionResponse.setResponse("Awesome! Your menu is now live.");
+        createdOptionResponse.setSuccess(true);
+        return createdOptionResponse;
+//        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
     }
 
     @Override

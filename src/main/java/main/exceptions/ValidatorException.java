@@ -1,12 +1,12 @@
 package main.exceptions;
 
 
-import main.dtos.requests.SignUpRequest;
-import main.dtos.requests.CreateOptionRequest;
-import main.dtos.requests.UpdateCompanyRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
+import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.models.enums.Category;
-import main.models.users.Company;
-import main.models.users.Option;
+import main.models.companies.Company;
+import main.models.companies.Option;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.List;
@@ -55,14 +55,14 @@ public class ValidatorException extends RuntimeException {
         }
     }
 
-    public static void ensureRequiredFieldsArePresent(SignUpRequest signUpRequest){
+    public static void ensureRequiredFieldsArePresent(CompanySignUpRequest companySignUpRequest){
 
-        String regNumber = signUpRequest.getBusinessRegistrationNumber();
+        String regNumber = companySignUpRequest.getBusinessRegistrationNumber();
 
         if(regNumber == null || regNumber.isEmpty() || regNumber.trim().isEmpty()){
             throw new ValidatorException("Business registration number is required");
         }
-        if(signUpRequest.getCategory() == null){
+        if(companySignUpRequest.getCategory() == null){
             throw new ValidatorException("You must select a category");
         }
     }
