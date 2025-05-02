@@ -1,21 +1,18 @@
 package main.dtos.requests;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter @Setter
-public class CompanyRequest {
+@Getter
+@Setter
+@ToString
+public class SignUpRequest {
     private String companyName;
     private List<String> companyPhone;
     private String companyEmail;
     private String businessRegistrationNumber;
     private String category;
-    private String companyApiKey;
-    private String baseUrl;
 }
