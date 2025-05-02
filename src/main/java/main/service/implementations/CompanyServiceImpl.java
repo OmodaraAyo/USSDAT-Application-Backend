@@ -7,7 +7,7 @@ import main.dtos.responses.DeleteResponse;
 import main.dtos.responses.CompanyDetailsResponse;
 import main.dtos.responses.LoginResponse;
 import main.dtos.responses.LogoutResponse;
-import main.dtos.responses.CompanyResponse;
+import main.dtos.responses.SignUpResponse;
 import main.dtos.responses.ChangePasswordResponse;
 import main.dtos.responses.UpdateCompanyResponse;
 import main.exceptions.ValidatorException;
@@ -61,10 +61,10 @@ public class CompanyServiceImpl implements CompanyService {
     public static String genPass;
 
     @Override
-    public CompanyResponse registerCompany(CompanyRequest companyRequest) {
-        validateRequestData(companyRequest);
-        doesCompanyExist(companyRequest);
-        return registerNewCompany(companyRequest);
+    public SignUpResponse registerCompany(SignUpRequest signUpRequest) {
+        validateRequestData(signUpRequest);
+        doesCompanyExist(signUpRequest);
+        return registerNewCompany(signUpRequest);
     }
 
     @Override
@@ -82,8 +82,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDetailsResponse findCompanyById(String id) {
-        Optional<Company> foundCompany = Optional.ofNullable(findById(id));
+    public CompanyDetailsResponse findCompanyById() {
+        Company authenticatedCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        Optional<Company> foundCompany = Optional.ofNullable(findById(authenticatedCompany.getCompanyId()));
         if (foundCompany.isPresent()) {
             return companyDetails(foundCompany.get());
         }
@@ -222,13 +223,13 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     private void validateUpdateRequestData(UpdateCompanyRequest updateRequest) {
-       ValidatorException.validateUpdateRequestDetails(updateRequest);
+        ValidatorException.validateUpdateRequestDetails(updateRequest);
     }
 
 
-    private void doesCompanyExist(CompanyRequest companyRequest) {
-        checkByCompanyEmail(companyRequest.getCompanyEmail());
-        checkByCompanyName(companyRequest.getCompanyName());
+    private void doesCompanyExist(SignUpRequest signUpRequest) {
+        checkByCompanyEmail(signUpRequest.getCompanyEmail());
+        checkByCompanyName(signUpRequest.getCompanyName());
     }
 
     private void checkByCompanyEmail(String companyEmail) {
@@ -306,26 +307,25 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepo.findByCompanyEmail(companyEmail.toLowerCase());
     }
 
-    private CompanyResponse registerNewCompany(CompanyRequest companyRequest) {
+    private SignUpResponse registerNewCompany(SignUpRequest signUpRequest) {
         String generatedPassword = generatePassword();
-        Company newCompany = createNewCompany(companyRequest, generatedPassword);
+        Company newCompany = createNewCompany(signUpRequest, generatedPassword);
         Company savedCompany = saveNewCompany(newCompany);
 
-        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
-        return new CompanyResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
+        mailRegisteredCompany(savedCompany.getCompanyName(), savedCompany.getCompanyEmail(), generatedPassword);
+        return new SignUpResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
     }
 
-    private Company createNewCompany(CompanyRequest companyRequest, String generatedPassword) {
+    private Company createNewCompany(SignUpRequest signUpRequest, String generatedPassword) {
         Company newCompany = new Company();
-        newCompany.setCompanyName(companyRequest.getCompanyName().toLowerCase());
-        newCompany.setCompanyPhone(companyRequest.getCompanyPhone());
-        newCompany.setCompanyEmail(companyRequest.getCompanyEmail().toLowerCase());
+        newCompany.setCompanyName(signUpRequest.getCompanyName().toLowerCase());
+        newCompany.setCompanyPhone(signUpRequest.getCompanyPhone());
+        newCompany.setCompanyEmail(signUpRequest.getCompanyEmail().toLowerCase());
         newCompany.setPassword(bCryptPasswordEncoder.encode(generatedPassword));
         newCompany.setApiKey(GeneratorUtil.generateKey(32));
         newCompany.setUssdShortCode(generateUssdCode());
-        newCompany.setBusinessRegistrationNumber(companyRequest.getBusinessRegistrationNumber());
-        newCompany.setCategory(Category.getCategory(companyRequest.getCategory()));
-        newCompany.setBaseUrl(companyRequest.getBaseUrl());
+        newCompany.setBusinessRegistrationNumber(signUpRequest.getBusinessRegistrationNumber());
+        newCompany.setCategory(Category.getCategory(signUpRequest.getCategory()));
         newCompany.setRole(Role.ADMIN);
         newCompany.setMenu(menuRepo.save(new Menu()));
         newCompany.setCreateAt(DateUtil.getCurrentDate());
@@ -349,16 +349,16 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
-    private void mailRegisteredCompany(String registeredCompanyEmail, String generatedPassword) {
-        emailServiceImpl.sendEmail(registeredCompanyEmail, generatedPassword);
+    private void mailRegisteredCompany(String companyName, String registeredCompanyEmail, String generatedPassword) {
+        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
     }
 
-    private void validateRequestData(CompanyRequest companyRequest) {
-        ValidatorException.validateCompanyName(companyRequest.getCompanyName());
-        ValidatorException.validateEmail(companyRequest.getCompanyEmail());
-        ValidatorException.validatePhoneNumber(companyRequest.getCompanyPhone());
-        ValidatorException.validateSelectedCategory(companyRequest.getCategory());
-        ValidatorException.ensureRequiredFieldsArePresent(companyRequest);
+    private void validateRequestData(SignUpRequest signUpRequest) {
+        ValidatorException.validateCompanyName(signUpRequest.getCompanyName());
+        ValidatorException.validateEmail(signUpRequest.getCompanyEmail());
+        ValidatorException.validatePhoneNumber(signUpRequest.getCompanyPhone());
+        ValidatorException.validateSelectedCategory(signUpRequest.getCategory());
+        ValidatorException.ensureRequiredFieldsArePresent(signUpRequest);
     }
 
     private String generateUssdCode() {
