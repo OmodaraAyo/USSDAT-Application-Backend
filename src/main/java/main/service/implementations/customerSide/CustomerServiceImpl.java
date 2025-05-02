@@ -64,7 +64,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
 
             // If context is "main", fetch the main menu
             if ("main".equals(userSession.getContext())) {
-                Company company = companyRepo.findBySubCode(fetchMenuRequest.getSubCode());
+                Company company = companyRepo.findByUssdShortCode(fetchMenuRequest.getSubCode());
                 if (company == null) {
                     throw new MenuOptionNotFoundException("Company not found for subCode: " + fetchMenuRequest.getSubCode());
                 }
@@ -129,7 +129,7 @@ public class CustomerServiceImpl implements CustomerServiceInterface {
             }
 
             // Fetch company to get baseUrl
-            Company company = companyRepo.findBySubCode(fetchMenuRequest.getSubCode());
+            Company company = companyRepo.findByUssdShortCode(fetchMenuRequest.getSubCode());
             if (company == null) {
                 throw new MenuOptionNotFoundException("Company not found for subCode: " + fetchMenuRequest.getSubCode());
             }

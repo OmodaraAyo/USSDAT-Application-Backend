@@ -10,5 +10,5 @@ public interface CompanyRepo extends MongoRepository<Company, String> {
     Company findByCompanyName(String name);
     Company findByCompanyEmail(String companyEmail);
 
-    Company findBySubCode(String subCode);
+    Company findByUssdShortCode(String subCode);
 }
