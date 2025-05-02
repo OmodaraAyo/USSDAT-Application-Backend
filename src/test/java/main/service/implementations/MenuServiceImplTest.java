@@ -54,13 +54,13 @@ public class MenuServiceImplTest {
         Update update = new Update().set("ussdCode", 1);
         mongoTemplate.upsert(query, update, UssdCounter.class);
 
-        CompanyRequest companyRequest = new CompanyRequest();
-        companyRequest.setCompanyName("Unius");
-        companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
-        companyRequest.setCompanyPhone(List.of("09012345678"));
-        companyRequest.setCategory("finance");
-        companyRequest.setBusinessRegistrationNumber("123456789");
-        companyService.registerCompany(companyRequest);
+        SignUpRequest signUpRequest = new SignUpRequest();
+        signUpRequest.setCompanyName("Unius");
+        signUpRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
+        signUpRequest.setCompanyPhone(List.of("09012345678"));
+        signUpRequest.setCategory("finance");
+        signUpRequest.setBusinessRegistrationNumber("123456789");
+        companyService.registerCompany(signUpRequest);
     }
 
     @Test
@@ -137,16 +137,16 @@ public class MenuServiceImplTest {
         assertThat(refreshCompany1II.getMenu().getOptions(), hasSize(1));
 
 
-        CompanyRequest companyRequest2 = new CompanyRequest();
-        companyRequest2.setCompanyName("Sui");
-        companyRequest2.setCompanyEmail("example@gmail.com");
-        companyRequest2.setCompanyPhone(List.of("08022211150"));
-        companyRequest2.setCategory("ECOMMERCE");
-        companyRequest2.setBusinessRegistrationNumber("987654321");
-        CompanyResponse companyResponse2 = companyService.registerCompany(companyRequest2);
+        SignUpRequest signUpRequest2 = new SignUpRequest();
+        signUpRequest2.setCompanyName("Sui");
+        signUpRequest2.setCompanyEmail("example@gmail.com");
+        signUpRequest2.setCompanyPhone(List.of("08022211150"));
+        signUpRequest2.setCategory("ECOMMERCE");
+        signUpRequest2.setBusinessRegistrationNumber("987654321");
+        SignUpResponse signUpResponse2 = companyService.registerCompany(signUpRequest2);
         String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("second registration: "+secondRegisteredCompanyPassword);
-        assertTrue(companyResponse2.isSuccess());
+        assertTrue(signUpResponse2.isSuccess());
 
         Company company2 = companyService.getByCompanyEmail("example@gmail.com");
         assertFalse(company2.isLoggedIn());
@@ -479,16 +479,16 @@ public class MenuServiceImplTest {
         System.out.println("Company 1:  "+companyMenu.getMenuOptions());
 
         //company 2
-        CompanyRequest companyRequest2 = new CompanyRequest();
-        companyRequest2.setCompanyName("Sui");
-        companyRequest2.setCompanyEmail("example@gmail.com");
-        companyRequest2.setCompanyPhone(List.of("08022211150"));
-        companyRequest2.setCategory("ECOMMERCE");
-        companyRequest2.setBusinessRegistrationNumber("987654321");
-        CompanyResponse companyResponse2 = companyService.registerCompany(companyRequest2);
+        SignUpRequest signUpRequest2 = new SignUpRequest();
+        signUpRequest2.setCompanyName("Sui");
+        signUpRequest2.setCompanyEmail("example@gmail.com");
+        signUpRequest2.setCompanyPhone(List.of("08022211150"));
+        signUpRequest2.setCategory("ECOMMERCE");
+        signUpRequest2.setBusinessRegistrationNumber("987654321");
+        SignUpResponse signUpResponse2 = companyService.registerCompany(signUpRequest2);
         String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("second registration: "+secondRegisteredCompanyPassword);
-        assertTrue(companyResponse2.isSuccess());
+        assertTrue(signUpResponse2.isSuccess());
 
         Company company2 = companyService.getByCompanyEmail("example@gmail.com");
         assertFalse(company2.isLoggedIn());
