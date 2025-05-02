@@ -54,13 +54,13 @@ public class MenuServiceImplTest {
         Update update = new Update().set("ussdCode", 1);
         mongoTemplate.upsert(query, update, UssdCounter.class);
 
-        CompanyRequest companyRequest = new CompanyRequest();
-        companyRequest.setCompanyName("Unius");
-        companyRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
-        companyRequest.setCompanyPhone(List.of("09012345678"));
-        companyRequest.setCategory("finance");
-        companyRequest.setBusinessRegistrationNumber("123456789");
-        companyService.registerCompany(companyRequest);
+        CompanySignUpRequest companySignUpRequest = new CompanySignUpRequest();
+        companySignUpRequest.setCompanyName("Unius");
+        companySignUpRequest.setCompanyEmail("ayodeleomodara1234@gmail.com");
+        companySignUpRequest.setCompanyPhone(List.of("09012345678"));
+        companySignUpRequest.setCategory("finance");
+        companySignUpRequest.setBusinessRegistrationNumber("123456789");
+        companyService.registerCompany(companySignUpRequest);
     }
 
     @Test
@@ -137,16 +137,16 @@ public class MenuServiceImplTest {
         assertThat(refreshCompany1II.getMenu().getOptions(), hasSize(1));
 
 
-        CompanyRequest companyRequest2 = new CompanyRequest();
-        companyRequest2.setCompanyName("Sui");
-        companyRequest2.setCompanyEmail("example@gmail.com");
-        companyRequest2.setCompanyPhone(List.of("08022211150"));
-        companyRequest2.setCategory("ECOMMERCE");
-        companyRequest2.setBusinessRegistrationNumber("987654321");
-        CompanyResponse companyResponse2 = companyService.registerCompany(companyRequest2);
+        CompanySignUpRequest companySignUpRequest2 = new CompanySignUpRequest();
+        companySignUpRequest2.setCompanyName("Sui");
+        companySignUpRequest2.setCompanyEmail("example@gmail.com");
+        companySignUpRequest2.setCompanyPhone(List.of("08022211150"));
+        companySignUpRequest2.setCategory("ECOMMERCE");
+        companySignUpRequest2.setBusinessRegistrationNumber("987654321");
+        CompanySignUpResponse signUpResponse2 = companyService.registerCompany(companySignUpRequest2);
         String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("second registration: "+secondRegisteredCompanyPassword);
-        assertTrue(companyResponse2.isSuccess());
+        assertTrue(signUpResponse2.isSuccess());
 
         Company company2 = companyService.getByCompanyEmail("example@gmail.com");
         assertFalse(company2.isLoggedIn());
@@ -479,16 +479,16 @@ public class MenuServiceImplTest {
         System.out.println("Company 1:  "+companyMenu.getMenuOptions());
 
         //company 2
-        CompanyRequest companyRequest2 = new CompanyRequest();
-        companyRequest2.setCompanyName("Sui");
-        companyRequest2.setCompanyEmail("example@gmail.com");
-        companyRequest2.setCompanyPhone(List.of("08022211150"));
-        companyRequest2.setCategory("ECOMMERCE");
-        companyRequest2.setBusinessRegistrationNumber("987654321");
-        CompanyResponse companyResponse2 = companyService.registerCompany(companyRequest2);
+        CompanySignUpRequest companySignUpRequest2 = new CompanySignUpRequest();
+        companySignUpRequest2.setCompanyName("Sui");
+        companySignUpRequest2.setCompanyEmail("example@gmail.com");
+        companySignUpRequest2.setCompanyPhone(List.of("08022211150"));
+        companySignUpRequest2.setCategory("ECOMMERCE");
+        companySignUpRequest2.setBusinessRegistrationNumber("987654321");
+        CompanySignUpResponse signUpResponse2 = companyService.registerCompany(companySignUpRequest2);
         String secondRegisteredCompanyPassword = CompanyServiceImpl.genPass;
         System.out.println("second registration: "+secondRegisteredCompanyPassword);
-        assertTrue(companyResponse2.isSuccess());
+        assertTrue(signUpResponse2.isSuccess());
 
         Company company2 = companyService.getByCompanyEmail("example@gmail.com");
         assertFalse(company2.isLoggedIn());

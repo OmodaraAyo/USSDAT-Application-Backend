@@ -1,7 +1,7 @@
 package main.exceptions;
 
 
-import main.dtos.requests.companyFaceRequest.CompanyRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.models.enums.Category;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ValidatorException extends RuntimeException {
 
-//    private static final String VALID_EMAIL_PATTERN = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
+    //    private static final String VALID_EMAIL_PATTERN = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@" + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
     private static final String NIGERIA_PHONE_NUMBER_PATTERN = "^(?!.*[^0-9+].*$)\\+?(234|0)[7-9][01][0-9]{8}$";
 
     public ValidatorException(String message) {
@@ -55,14 +55,14 @@ public class ValidatorException extends RuntimeException {
         }
     }
 
-    public static void ensureRequiredFieldsArePresent(CompanyRequest companyRequest){
+    public static void ensureRequiredFieldsArePresent(CompanySignUpRequest companySignUpRequest){
 
-        String regNumber = companyRequest.getBusinessRegistrationNumber();
+        String regNumber = companySignUpRequest.getBusinessRegistrationNumber();
 
         if(regNumber == null || regNumber.isEmpty() || regNumber.trim().isEmpty()){
             throw new ValidatorException("Business registration number is required");
         }
-        if(companyRequest.getCategory() == null){
+        if(companySignUpRequest.getCategory() == null){
             throw new ValidatorException("You must select a category");
         }
     }
