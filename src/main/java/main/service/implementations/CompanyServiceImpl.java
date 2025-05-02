@@ -350,7 +350,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private void mailRegisteredCompany(String companyName, String registeredCompanyEmail, String generatedPassword) {
-        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
+//        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
     }
 
     private void validateRequestData(SignUpRequest signUpRequest) {
