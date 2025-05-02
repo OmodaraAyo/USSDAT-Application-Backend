@@ -4,5 +4,5 @@ import main.models.users.Company;
 
 public interface EmailService {
 
-    void sendEmail(String registeredCompanyEmail, String generatedPassword);
+    void sendEmail(String companyName, String registeredCompanyEmail, String generatedPassword);
 }
