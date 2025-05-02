@@ -353,7 +353,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private void mailRegisteredCompany(String registeredCompanyEmail, String generatedPassword) {
-        emailServiceImpl.sendEmail(registeredCompanyEmail, generatedPassword);
+//        emailServiceImpl.sendEmail(registeredCompanyEmail, generatedPassword);
     }
 
     private void validateRequestData(CompanyRequest companyRequest) {
