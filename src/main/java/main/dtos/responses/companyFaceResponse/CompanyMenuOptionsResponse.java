@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter @Setter
-public class CompanyMenuOptionResponse {
+public class CompanyMenuOptionsResponse {
     private String companyId;
     private List<String> menuOptions = new ArrayList<>();
 }

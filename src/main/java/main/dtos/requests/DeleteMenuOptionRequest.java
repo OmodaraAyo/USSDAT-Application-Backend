@@ -1,4 +1,4 @@
-package main.dtos.requests.companyFaceRequest;
+package main.dtos.requests;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,7 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class UpdateOptionRequest {
-    private String newOptionName;
+@Getter @Setter
+public class DeleteMenuOptionRequest {
+    private String optionId;
 }

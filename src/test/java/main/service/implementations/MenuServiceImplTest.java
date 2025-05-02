@@ -1,5 +1,6 @@
 package main.service.implementations;
 
+import main.dtos.requests.DeleteMenuOptionRequest;
 import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
@@ -66,7 +67,7 @@ public class MenuServiceImplTest {
     @Test
     public void shouldNotAddMenuOptionWhenCompanyIsNotAuthenticated(){
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            menuService.addNewOption(new CreateOptionRequest("register"));
+            menuService.addNewOption("12344",new CreateOptionRequest("register"));
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
@@ -103,7 +104,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshCompany1.isLoggedIn());
         assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
-        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedOption = menuService.addNewOption(refreshCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
         Company refreshCompany2 = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertTrue(refreshCompany2.isLoggedIn());
@@ -128,7 +129,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshCompany1.isLoggedIn());
         assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
-        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedOption = menuService.addNewOption(refreshCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
         Company refreshCompany1II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertTrue(refreshCompany1II.isLoggedIn());
@@ -162,7 +163,7 @@ public class MenuServiceImplTest {
 
 
         //add first menu for company 2
-        CreatedOptionResponse addFirstMenuOptionFoeCompany2 = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse addFirstMenuOptionFoeCompany2 = menuService.addNewOption(refreshCompany2.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", addFirstMenuOptionFoeCompany2.getResponse());
         Company refreshCompany2II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertTrue(refreshCompany2II.isLoggedIn());
@@ -187,7 +188,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            menuService.addNewOption(new CreateOptionRequest("   "));
+            menuService.addNewOption(refreshCompany1.getCompanyId(),new CreateOptionRequest("   "));
         });
         assertEquals("Please enter a menu title.", exception.getMessage());
     }
@@ -207,7 +208,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshCompany1.isLoggedIn());
         assertTrue(refreshCompany1.getMenu().getOptions().isEmpty());
 
-        CreatedOptionResponse savedOption = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedOption = menuService.addNewOption(refreshCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedOption.getResponse());
         Company refreshCompany1II = companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertTrue(refreshCompany1II.isLoggedIn());
@@ -216,7 +217,7 @@ public class MenuServiceImplTest {
         assertThat(refreshCompany1II.getMenu().getOptions(), hasSize(1));
 
         ValidatorException exception = assertThrows(ValidatorException.class, () -> {
-            menuService.addNewOption(new CreateOptionRequest("register"));
+            menuService.addNewOption(refreshCompany1II.getCompanyId(),new CreateOptionRequest("register"));
         });
 
         assertEquals("Oops! A menu titled 'Register' already exists. Please try another name.", exception.getMessage());
@@ -240,18 +241,18 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
         //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
         //add first menu for company 3
-        CreatedOptionResponse savedMenu3 = menuService.addNewOption(new CreateOptionRequest("Transfer"));
+        CreatedOptionResponse savedMenu3 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Transfer"));
         assertEquals("Awesome! Your menu is now live.", savedMenu3.getResponse());
 
-        MenuOptionResponse response = menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
+        MenuOptionResponse response = menuService.getMenuOptionByTitle(refreshFirstCompany1.getCompanyId(),"transfer");
         assertTrue(response.isSuccess());
         assertEquals("Transfer".toLowerCase(), response.getTitle().toLowerCase());
     }
@@ -273,7 +274,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         EmptyItemException exception = assertThrows(EmptyItemException.class, () -> {
-            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
+            menuService.getMenuOptionByTitle(refreshFirstCompany1.getCompanyId(), "transfer");
         });
 
         assertEquals("Looks like there’s nothing here yet. Add a menu to get started!", exception.getMessage());
@@ -296,11 +297,11 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
         MenuOptionNotFoundException exception = assertThrows(MenuOptionNotFoundException.class, () -> {
-            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
+            menuService.getMenuOptionByTitle(refreshFirstCompany1.getCompanyId(), "transfer");
         });
 
         assertEquals("No menu option found with the title \"transfer\".", exception.getMessage());
@@ -310,7 +311,7 @@ public class MenuServiceImplTest {
     @Test
     public void shouldNotAllowMenuSearchWhenCompanyIsNotAuthenticated(){
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            menuService.getMenuOptionByTitle(new MenuOptionRequest("transfer"));
+            menuService.getMenuOptionByTitle("12344", "transfer");
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
@@ -332,14 +333,14 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
         //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
-        DeleteMenuOptionResponse deletedMenuResponse = menuService.deleteMenuOptionById(savedMenu2.getOptionId());
+        DeleteMenuOptionResponse deletedMenuResponse = menuService.deleteMenuOptionById(refreshFirstCompany1.getCompanyId(), savedMenu2.getOptionId());
         System.out.println("Menu OptionId: "+savedMenu2.getOptionId());
         assertTrue(deletedMenuResponse.isSuccess());
         assertEquals("Deleted successfully.",deletedMenuResponse.getMessage());
@@ -362,14 +363,14 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
-        //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        //add second menu for company 1
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
-        MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(new FindMenuOptionByIdRequest(savedMenu2.getOptionId()));
+        MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(refreshFirstCompany1.getCompanyId(), savedMenu2.getOptionId());
         assertTrue(menuOptionResponse.isSuccess());
         assertEquals("Check balance".toLowerCase(), menuOptionResponse.getTitle().toLowerCase());
     }
@@ -391,15 +392,15 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
-        //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        //add second menu for company 1
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
         MenuOptionNotFoundException exception = assertThrows(MenuOptionNotFoundException.class, ()-> {
-            menuService.getMenuOptionById(new FindMenuOptionByIdRequest("123345669"));
+            menuService.getMenuOptionById(refreshFirstCompany1.getCompanyId(),"123345669");
         });
 
         assertEquals("No menu option found with this id: \"123345669\".", exception.getMessage());
@@ -422,17 +423,17 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
         Company refreshFirstCompany2 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertEquals("register".toLowerCase(), refreshFirstCompany2.getMenu().getOptions().get(0).getTitle().toLowerCase());
 
-        //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        //add second menu for company 1
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany2.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
-        UpdateOptionResponse updatedMenuOption = menuService.updateMenuOption(new UpdateOptionRequest(savedMenu.getOptionId(), "Transfer"));
+        UpdateOptionResponse updatedMenuOption = menuService.updateMenuOption(refreshFirstCompany2.getCompanyId(), savedMenu.getOptionId() ,new UpdateOptionRequest( "Transfer"));
         assertTrue(updatedMenuOption.isSuccess());
 
         Company refreshFirstCompany3 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
@@ -456,22 +457,22 @@ public class MenuServiceImplTest {
         assertTrue(refreshFirstCompany1.getMenu().getOptions().isEmpty());
 
         //add first menu for company 1
-        CreatedOptionResponse savedMenu = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse savedMenu = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", savedMenu.getResponse());
 
-        //add first menu for company 2
-        CreatedOptionResponse savedMenu2 = menuService.addNewOption(new CreateOptionRequest("Check balance"));
+        //add second menu for company 1
+        CreatedOptionResponse savedMenu2 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Check balance"));
         assertEquals("Awesome! Your menu is now live.", savedMenu2.getResponse());
 
-        //add first menu for company 3
-        CreatedOptionResponse savedMenu3 = menuService.addNewOption(new CreateOptionRequest("Transfer"));
+        //add third menu for company 1
+        CreatedOptionResponse savedMenu3 = menuService.addNewOption(refreshFirstCompany1.getCompanyId(),new CreateOptionRequest("Transfer"));
         assertEquals("Awesome! Your menu is now live.", savedMenu3.getResponse());
 
         Company refreshFirstCompany2 =  companyService.getByCompanyEmail("ayodeleomodara1234@gmail.com");
         assertTrue(refreshFirstCompany2.isLoggedIn());
         assertFalse(refreshFirstCompany2.getMenu().getOptions().isEmpty());
 
-        CompanyMenuOptionResponse companyMenu = menuService.getMenuOptionsForCompany(new CompanyMenuOptionRequest(refreshFirstCompany2.getCompanyId()));
+        CompanyMenuOptionsResponse companyMenu = menuService.getMenuOptionsForCompany(refreshFirstCompany2.getCompanyId());
         assertEquals("register".toLowerCase(), companyMenu.getMenuOptions().get(0).toLowerCase());
         assertEquals("Check balance".toLowerCase(), companyMenu.getMenuOptions().get(1).toLowerCase());
         assertEquals("Transfer".toLowerCase(), companyMenu.getMenuOptions().get(2).toLowerCase());
@@ -504,11 +505,11 @@ public class MenuServiceImplTest {
 
 
         //add first menu for company 2
-        CreatedOptionResponse addFirstMenuOptionForCompany2 = menuService.addNewOption(new CreateOptionRequest("register"));
+        CreatedOptionResponse addFirstMenuOptionForCompany2 = menuService.addNewOption(refreshCompany2.getCompanyId(),new CreateOptionRequest("register"));
         assertEquals("Awesome! Your menu is now live.", addFirstMenuOptionForCompany2.getResponse());
 
         //add second menu for company 2
-        CreatedOptionResponse addSecondMenuOptionForCompany2 = menuService.addNewOption(new CreateOptionRequest("Buy data"));
+        CreatedOptionResponse addSecondMenuOptionForCompany2 = menuService.addNewOption(refreshCompany2.getCompanyId(),new CreateOptionRequest("Buy data"));
         assertEquals("Awesome! Your menu is now live.", addSecondMenuOptionForCompany2.getResponse());
 
 
@@ -516,7 +517,7 @@ public class MenuServiceImplTest {
         assertTrue(refreshSecondCompany2II.isLoggedIn());
         assertFalse(refreshSecondCompany2II.getMenu().getOptions().isEmpty());
 
-        CompanyMenuOptionResponse secondCompanyMenu = menuService.getMenuOptionsForCompany(new CompanyMenuOptionRequest(refreshSecondCompany2II.getCompanyId()));
+        CompanyMenuOptionsResponse secondCompanyMenu = menuService.getMenuOptionsForCompany(refreshSecondCompany2II.getCompanyId());
         assertEquals("register".toLowerCase(), secondCompanyMenu.getMenuOptions().get(0).toLowerCase());
         assertEquals("Buy data".toLowerCase(), secondCompanyMenu.getMenuOptions().get(1).toLowerCase());
         System.out.println("Second company: "+secondCompanyMenu.getMenuOptions());
