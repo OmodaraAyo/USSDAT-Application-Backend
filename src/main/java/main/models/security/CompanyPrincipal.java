@@ -17,7 +17,10 @@ public class CompanyPrincipal implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (company.getRole() == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + company.getRole().name()));
     }
 
     @Override
