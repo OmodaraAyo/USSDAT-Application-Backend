@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-public class CompanyResponse {
+public class SignUpResponse {
     private String message;
     private String id;
     private boolean isSuccess;

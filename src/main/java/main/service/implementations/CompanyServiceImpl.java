@@ -3,21 +3,21 @@ package main.service.implementations;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
 import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
-import main.dtos.requests.companyFaceRequest.CompanyRequest;
 import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.dtos.responses.companyFaceResponse.DeleteResponse;
 import main.dtos.responses.companyFaceResponse.CompanyDetailsResponse;
 import main.dtos.responses.companyFaceResponse.LoginResponse;
 import main.dtos.responses.companyFaceResponse.LogoutResponse;
-import main.dtos.responses.companyFaceResponse.CompanyResponse;
 import main.dtos.responses.companyFaceResponse.ChangePasswordResponse;
 import main.dtos.responses.companyFaceResponse.UpdateCompanyResponse;
+import main.dtos.responses.companyFaceResponse.CompanySignUpResponse;
 import main.exceptions.ValidatorException;
-import main.models.enums.Category;
-import main.models.enums.Role;
 import main.models.companies.Company;
 import main.models.companies.Menu;
+import main.models.enums.Category;
+import main.models.enums.Role;
 import main.repositories.CompanyRepo;
 import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
@@ -64,10 +64,10 @@ public class CompanyServiceImpl implements CompanyService {
     public static String genPass;
 
     @Override
-    public CompanyResponse registerCompany(CompanyRequest companyRequest) {
-        validateRequestData(companyRequest);
-        doesCompanyExist(companyRequest);
-        return registerNewCompany(companyRequest);
+    public CompanySignUpResponse registerCompany(CompanySignUpRequest companySignUpRequest) {
+        validateRequestData(companySignUpRequest);
+        doesCompanyExist(companySignUpRequest);
+        return registerNewCompany(companySignUpRequest);
     }
 
     @Override
@@ -85,8 +85,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDetailsResponse findCompanyById(String id) {
-        Optional<Company> foundCompany = Optional.ofNullable(findById(id));
+    public CompanyDetailsResponse findCompanyById() {
+        Company authenticatedCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        Optional<Company> foundCompany = Optional.ofNullable(findById(authenticatedCompany.getCompanyId()));
         if (foundCompany.isPresent()) {
             return companyDetails(foundCompany.get());
         }
@@ -225,13 +226,13 @@ public class CompanyServiceImpl implements CompanyService {
 
 
     private void validateUpdateRequestData(UpdateCompanyRequest updateRequest) {
-       ValidatorException.validateUpdateRequestDetails(updateRequest);
+        ValidatorException.validateUpdateRequestDetails(updateRequest);
     }
 
 
-    private void doesCompanyExist(CompanyRequest companyRequest) {
-        checkByCompanyEmail(companyRequest.getCompanyEmail());
-        checkByCompanyName(companyRequest.getCompanyName());
+    private void doesCompanyExist(CompanySignUpRequest companySignUpRequest) {
+        checkByCompanyEmail(companySignUpRequest.getCompanyEmail());
+        checkByCompanyName(companySignUpRequest.getCompanyName());
     }
 
     private void checkByCompanyEmail(String companyEmail) {
@@ -309,26 +310,25 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepo.findByCompanyEmail(companyEmail.toLowerCase());
     }
 
-    private CompanyResponse registerNewCompany(CompanyRequest companyRequest) {
+    private CompanySignUpResponse registerNewCompany(CompanySignUpRequest companySignUpRequest) {
         String generatedPassword = generatePassword();
-        Company newCompany = createNewCompany(companyRequest, generatedPassword);
+        Company newCompany = createNewCompany(companySignUpRequest, generatedPassword);
         Company savedCompany = saveNewCompany(newCompany);
 
-        mailRegisteredCompany(savedCompany.getCompanyEmail(), generatedPassword);
-        return new CompanyResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
+        mailRegisteredCompany(savedCompany.getCompanyName(), savedCompany.getCompanyEmail(), generatedPassword);
+        return new CompanySignUpResponse("Registration successful! Login credentials will be sent to your email shortly.", savedCompany.getCompanyId(), true, false);
     }
 
-    private Company createNewCompany(CompanyRequest companyRequest, String generatedPassword) {
+    private Company createNewCompany(CompanySignUpRequest companySignUpRequest, String generatedPassword) {
         Company newCompany = new Company();
-        newCompany.setCompanyName(companyRequest.getCompanyName().toLowerCase());
-        newCompany.setCompanyPhone(companyRequest.getCompanyPhone());
-        newCompany.setCompanyEmail(companyRequest.getCompanyEmail().toLowerCase());
+        newCompany.setCompanyName(companySignUpRequest.getCompanyName().toLowerCase());
+        newCompany.setCompanyPhone(companySignUpRequest.getCompanyPhone());
+        newCompany.setCompanyEmail(companySignUpRequest.getCompanyEmail().toLowerCase());
         newCompany.setPassword(bCryptPasswordEncoder.encode(generatedPassword));
         newCompany.setApiKey(GeneratorUtil.generateKey(32));
         newCompany.setUssdShortCode(generateUssdCode());
-        newCompany.setBusinessRegistrationNumber(companyRequest.getBusinessRegistrationNumber());
-        newCompany.setCategory(Category.getCategory(companyRequest.getCategory()));
-        newCompany.setBaseUrl(companyRequest.getBaseUrl());
+        newCompany.setBusinessRegistrationNumber(companySignUpRequest.getBusinessRegistrationNumber());
+        newCompany.setCategory(Category.getCategory(companySignUpRequest.getCategory()));
         newCompany.setRole(Role.ADMIN);
         newCompany.setMenu(menuRepo.save(new Menu()));
         newCompany.setCreateAt(DateUtil.getCurrentDate());
@@ -352,16 +352,16 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
-    private void mailRegisteredCompany(String registeredCompanyEmail, String generatedPassword) {
-//        emailServiceImpl.sendEmail(registeredCompanyEmail, generatedPassword);
+    private void mailRegisteredCompany(String companyName, String registeredCompanyEmail, String generatedPassword) {
+//        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
     }
 
-    private void validateRequestData(CompanyRequest companyRequest) {
-        ValidatorException.validateCompanyName(companyRequest.getCompanyName());
-        ValidatorException.validateEmail(companyRequest.getCompanyEmail());
-        ValidatorException.validatePhoneNumber(companyRequest.getCompanyPhone());
-        ValidatorException.validateSelectedCategory(companyRequest.getCategory());
-        ValidatorException.ensureRequiredFieldsArePresent(companyRequest);
+    private void validateRequestData(CompanySignUpRequest companySignUpRequest) {
+        ValidatorException.validateCompanyName(companySignUpRequest.getCompanyName());
+        ValidatorException.validateEmail(companySignUpRequest.getCompanyEmail());
+        ValidatorException.validatePhoneNumber(companySignUpRequest.getCompanyPhone());
+        ValidatorException.validateSelectedCategory(companySignUpRequest.getCategory());
+        ValidatorException.ensureRequiredFieldsArePresent(companySignUpRequest);
     }
 
     private String generateUssdCode() {
