@@ -1,8 +1,8 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-import main.service.interfaces.EmailService;
+import main.service.interfaces.companySide.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;

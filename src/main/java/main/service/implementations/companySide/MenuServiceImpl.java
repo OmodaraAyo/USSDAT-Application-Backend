@@ -1,6 +1,5 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
-import main.dtos.requests.DeleteMenuOptionRequest;
 import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
@@ -11,7 +10,7 @@ import main.models.companies.Company;
 import main.models.companies.Menu;
 import main.models.companies.Option;
 import main.repositories.MenuRepo;
-import main.service.interfaces.MenuService;
+import main.service.interfaces.companySide.MenuService;
 import main.utils.DateUtil;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package main.service.interfaces;
+package main.service.interfaces.companySide;
 
 public interface EmailService {
 

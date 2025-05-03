@@ -6,7 +6,7 @@ import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.LoginRequest;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.dtos.responses.companyFaceResponse.*;
-import main.service.interfaces.CompanyService;
+import main.service.interfaces.companySide.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,10 +1,9 @@
 package main.controllers.companies;
 
 import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
-import main.dtos.requests.companyFaceRequest.MenuOptionRequest;
 import main.dtos.requests.companyFaceRequest.UpdateOptionRequest;
 import main.dtos.responses.companyFaceResponse.*;
-import main.service.interfaces.MenuService;
+import main.service.interfaces.companySide.MenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
