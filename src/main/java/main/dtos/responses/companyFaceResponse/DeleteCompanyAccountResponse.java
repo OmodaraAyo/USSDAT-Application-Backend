@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class DeleteResponse {
+public class DeleteCompanyAccountResponse {
     private String message;
     private boolean isSuccess;
 }

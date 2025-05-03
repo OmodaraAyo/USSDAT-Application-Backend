@@ -6,11 +6,9 @@ import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.ValidatorException;
 import main.models.companies.Company;
-import main.models.companies.Menu;
 import main.models.enums.Category;
 import main.models.enums.Role;
 import main.repositories.CompanyRepo;
-import main.repositories.MenuRepo;
 import main.service.interfaces.CompanyService;
 import main.service.interfaces.EmailService;
 import main.service.interfaces.MenuService;
@@ -78,8 +76,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public CompanyDetailsResponse findCompanyById() {
+    public CompanyDetailsResponse findCompanyById(String id) {
         Company authenticatedCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(id, authenticatedCompany.getCompanyId());
         Optional<Company> foundCompany = Optional.ofNullable(findById(authenticatedCompany.getCompanyId()));
         if (foundCompany.isPresent()) {
             return companyDetails(foundCompany.get());
@@ -97,9 +96,9 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public UpdateCompanyResponse updateCompanyDetails(UpdateCompanyRequest updateRequest) {
+    public UpdateCompanyResponse updateCompanyDetails(String companyId, UpdateCompanyRequest updateRequest) {
         Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-
+        ValidatorException.validateId(companyId, company.getCompanyId());
         validateUpdateRequestData(updateRequest);
         company.setCompanyPhone(updateRequest.getCompanyRequest().getCompanyPhone());
 //        company.setCategory(Category.valueOf(updateRequest.getCompanyRequest().getCategory()));
@@ -113,18 +112,19 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ChangePasswordResponse resetPassword(ChangePasswordRequest request) {
-        Company currentLoggedInCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-        if(!bCryptPasswordEncoder.matches(request.getOldPassword(), currentLoggedInCompany.getPassword())) {
+    public ChangePasswordResponse resetPassword(String companyId, ChangePasswordRequest changePasswordRequest) {
+        Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
+        if(!bCryptPasswordEncoder.matches(changePasswordRequest.getOldPassword(), activeCompanySession.getPassword())) {
             throw new ValidatorException("The provided old password does not match our records");
         }
-        return updateCompanyPassword(currentLoggedInCompany, request);
+        return updateCompanyPassword(activeCompanySession, changePasswordRequest);
     }
 
     @Override
-    public LogoutResponse logOut() {
+    public LogoutResponse logOut(String companyId) {
         Company currentLoggedInCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-
+        ValidatorException.validateId(companyId, currentLoggedInCompany.getCompanyId());
         currentLoggedInCompany.setLoggedIn(false);
         companyRepo.save(currentLoggedInCompany);
 
@@ -133,15 +133,15 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public DeleteResponse deleteById() {
+    public DeleteCompanyAccountResponse deactivateCompany(String companyId) {
         Company deleteCompany = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-
+        ValidatorException.validateId(companyId, deleteCompany.getCompanyId());
         deleteCompany.setActive(false);
         deleteCompany.setLoggedIn(false);
         deleteCompany.setUpdateAt(DateUtil.getCurrentDate());
         deleteCompany.setLastLoginDate(DateUtil.getCurrentDate());
         companyRepo.save(deleteCompany);
-        return new DeleteResponse("Account closed successfully", true);
+        return new DeleteCompanyAccountResponse("Account closed successfully", true);
     }
 
     @Override
@@ -150,9 +150,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public DeleteResponse deleteAllCompanies() {
+    public void deleteAllCompanies() {
         companyRepo.deleteAll();
-        return new DeleteResponse("Deleted all companies", true);
     }
 
     @Override
@@ -160,15 +159,6 @@ public class CompanyServiceImpl implements CompanyService {
         return findById(id);
     }
 
-    @Override
-    public DeleteResponse deleteByCompanyId(String id) {
-        Optional<Company> deleteCompany = Optional.ofNullable(findById(id));
-        if (deleteCompany.isPresent()) {
-            companyRepo.delete(deleteCompany.get());
-            return new DeleteResponse("Deleted successfully", true);
-        }
-        return null;
-    }
 
     @Override
     public Company saveCompany(Company company) {
