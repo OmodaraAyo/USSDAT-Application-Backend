@@ -92,4 +92,21 @@ class FetchMenuServiceTest {
         Exception exception = assertThrows(CompanyNotFound.class, () -> fetchMenuService.fetchMainMenu(request));
         assertEquals("This company does not exist", exception.getMessage());
     }
+    @Test
+    void testFetchMainMenu_NoMenu() {
+        Company testCompany = new Company();
+        testCompany.setUssdShortCode("11111");
+        testCompany.setMenu(null);
+        companyRepo.save(testCompany);
+
+        FetchMenuFromCompanyDBRequest request = new FetchMenuFromCompanyDBRequest();
+        request.setSubCode("11111");
+
+        FetchMenuFromCompanyDBResponse response = fetchMenuService.fetchMainMenu(request);
+
+        assertEquals("This company has no menu", response.getMessage());
+        assertEquals("No menu", response.getContext());
+        assertNull(response.getOptions());
+    }
+
 }
