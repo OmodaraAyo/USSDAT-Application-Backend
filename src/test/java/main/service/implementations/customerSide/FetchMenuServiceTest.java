@@ -65,7 +65,7 @@ class FetchMenuServiceTest {
 
         companyRepo.save(testCompany);
     }
-    @AfterEach
+    @BeforeEach
    void tearDown(){
         companyRepo.deleteAll();
     }
