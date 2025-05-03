@@ -1,4 +1,4 @@
-package main.service.interfaces;
+package main.service.interfaces.companySide;
 
 import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;

@@ -1,4 +1,4 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
 import main.models.companies.Company;
 import main.repositories.CompanyRepo;

@@ -13,7 +13,7 @@ public class Option {
     private String menuId;
     private String optionId;
     private String title;
-    private String context;
+//    private String context;
     private String createdAt;
     private String updatedAt;
 
