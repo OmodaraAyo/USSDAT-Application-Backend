@@ -32,6 +32,7 @@ public class MenuController {
     }
 
     @GetMapping("/{company_id}/options/{option_id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<MenuOptionResponse>> getMenuOptionById(@PathVariable("company_id") String companyId, @PathVariable String option_id){
         MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(companyId, option_id);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", menuOptionResponse));

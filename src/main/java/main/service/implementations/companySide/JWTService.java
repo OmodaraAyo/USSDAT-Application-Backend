@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -30,8 +27,9 @@ public class JWTService {
             throw new RuntimeException(e);
         }
     }
-    public String generateToken(String companyEmail) {
+    public String generateToken(String companyEmail, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", List.of("ROLE_" + role));
 
         return Jwts.builder()
                 .claims()
@@ -68,7 +66,15 @@ public class JWTService {
 
     public boolean validateToken(String jwtToken, UserDetails userDetails) {
         final String username = extractCompanyEmail(jwtToken);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(jwtToken));
+        List<String> roles = extractRoles(jwtToken);
+        boolean isRoleValid = userDetails.getAuthorities().stream().anyMatch(auth -> roles.contains(auth.getAuthority()));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(jwtToken) && isRoleValid);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> extractRoles(String jwtToken){
+        Claims claims = extractAllClaims(jwtToken);
+        return (List<String>) claims.get("role", List.class);
     }
 
     private boolean isTokenExpired(String jwtToken) {

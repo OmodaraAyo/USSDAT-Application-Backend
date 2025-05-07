@@ -25,6 +25,7 @@ public class CompanyDetailsResponse {
     private String baseUrl;
     private boolean isActive;
     private boolean isLoggedIn;
+    private String warning;
     private String role;
     private boolean isFirstLogin;
     private String lastLoginDate;
