@@ -127,8 +127,6 @@ public class CompanyServiceImpl implements CompanyService {
         ValidatorException.validateId(companyId, currentLoggedInCompany.getCompanyId());
         currentLoggedInCompany.setLoggedIn(false);
         companyRepo.save(currentLoggedInCompany);
-
-
         return new LogoutResponse("Logout successful");
     }
 
@@ -234,7 +232,19 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private CompanyDetailsResponse companyDetails(Company company) {
+        if(company.isFirstLogin()){
+            return companyDetailsWithWarning(company);
+        }
+        return companyDetailsWithoutWarning(company);
+    }
+
+    private CompanyDetailsResponse companyDetailsWithoutWarning(Company company) {
         CompanyDetailsResponse companyDetailsResponse = new CompanyDetailsResponse();
+        setCompanyDetailsResponse(company, companyDetailsResponse);
+        return companyDetailsResponse;
+    }
+
+    private void setCompanyDetailsResponse(Company company, CompanyDetailsResponse companyDetailsResponse) {
         companyDetailsResponse.setCompanyId(company.getCompanyId());
         companyDetailsResponse.setUssdShortCode(company.getUssdShortCode());
         companyDetailsResponse.setCompanyName(company.getCompanyName());
@@ -251,6 +261,12 @@ public class CompanyServiceImpl implements CompanyService {
         companyDetailsResponse.setLastLoginDate(company.getLastLoginDate());
         companyDetailsResponse.setCreateAt(company.getCreateAt());
         companyDetailsResponse.setUpdateAt(company.getUpdateAt());
+    }
+
+    private CompanyDetailsResponse companyDetailsWithWarning(Company company) {
+        CompanyDetailsResponse companyDetailsResponse = new CompanyDetailsResponse();
+        setCompanyDetailsResponse(company, companyDetailsResponse);
+        companyDetailsResponse.setWarning("Your default password is temporary and expires after first use. Please set a new password.");
         return companyDetailsResponse;
     }
 
@@ -268,7 +284,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createLoginResponseWithoutWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase(), getCurrentLoggedInCompany.getRole()));
         loginResponse.setResponse("Login Successful");
         loginResponse.setIsLoggedIn(true);
         loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());
@@ -277,7 +293,8 @@ public class CompanyServiceImpl implements CompanyService {
 
     private LoginResponse createFirstLoginResponseWithWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase()));
+        loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase(), getCurrentLoggedInCompany.getRole()));
+        loginResponse.setRef(getCurrentLoggedInCompany.getCompanyId());
         loginResponse.setResponse("Login Successful");
         loginResponse.setWarning("Your default password is temporary and expires after first use. Please set a new password.");
         loginResponse.setIsLoggedIn(true);
@@ -336,7 +353,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     private void mailRegisteredCompany(String companyName, String registeredCompanyEmail, String generatedPassword) {
-//        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
+        emailServiceImpl.sendEmail(companyName, registeredCompanyEmail, generatedPassword);
     }
 
     private void validateRequestData(CompanySignUpRequest companySignUpRequest) {
