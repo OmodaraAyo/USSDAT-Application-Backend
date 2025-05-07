@@ -1,7 +1,7 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
 import main.models.enums.Category;
-import main.service.interfaces.CategoryService;
+import main.service.interfaces.companySide.CategoryService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
@@ -9,9 +9,9 @@ import main.models.companies.Company;
 import main.models.enums.Category;
 import main.models.enums.Role;
 import main.repositories.CompanyRepo;
-import main.service.interfaces.CompanyService;
-import main.service.interfaces.EmailService;
-import main.service.interfaces.MenuService;
+import main.service.interfaces.companySide.CompanyService;
+import main.service.interfaces.companySide.EmailService;
+import main.service.interfaces.companySide.MenuService;
 import main.utils.DateUtil;
 import main.utils.GeneratorUtil;
 import main.utils.UssdCounterUtil;

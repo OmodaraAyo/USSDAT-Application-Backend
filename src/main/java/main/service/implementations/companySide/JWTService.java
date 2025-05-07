@@ -1,4 +1,4 @@
-package main.service.implementations;
+package main.service.implementations.companySide;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

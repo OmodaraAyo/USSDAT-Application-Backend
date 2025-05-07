@@ -1,6 +1,5 @@
 package main.service.implementations;
 
-import main.dtos.requests.DeleteMenuOptionRequest;
 import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.EmptyItemException;
@@ -10,8 +9,9 @@ import main.models.security.CompanyPrincipal;
 import main.models.companies.Company;
 import main.models.utils.UssdCounter;
 import main.repositories.MenuRepo;
-import main.service.interfaces.CompanyService;
-import main.service.interfaces.MenuService;
+import main.service.implementations.companySide.CompanyServiceImpl;
+import main.service.interfaces.companySide.CompanyService;
+import main.service.interfaces.companySide.MenuService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
