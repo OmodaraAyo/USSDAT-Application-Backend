@@ -1,6 +1,6 @@
 package main.controllers;
 
-import main.dtos.responses.ApiResponse;
+import main.dtos.responses.companyFaceResponse.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

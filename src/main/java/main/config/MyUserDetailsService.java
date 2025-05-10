@@ -1,6 +1,6 @@
 package main.config;
 
-import main.models.users.Company;
+import main.models.companies.Company;
 import main.models.security.CompanyPrincipal;
 import main.repositories.CompanyRepo;
 import org.springframework.beans.factory.annotation.Autowired;
