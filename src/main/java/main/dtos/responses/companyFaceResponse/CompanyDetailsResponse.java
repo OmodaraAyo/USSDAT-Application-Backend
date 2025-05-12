@@ -22,6 +22,7 @@ public class CompanyDetailsResponse {
     private Category category;
     private String companyApiKey;
     private String apiKey;
+    private List<OptionResponse> options;
     private String baseUrl;
     private boolean isActive;
     private boolean isLoggedIn;
