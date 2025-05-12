@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class UserInteractionResponse {
     private String message;
-    private boolean isEnd;
+    private Boolean isEnd;
     private List<Option> options;
+//    private boolean isEnd;
 }

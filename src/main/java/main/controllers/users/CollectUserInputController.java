@@ -2,6 +2,7 @@ package main.controllers.users;
 
 import main.dtos.requests.customerFaceRequest.UserInteractionRequest;
 import main.dtos.responses.customerFaceResponse.UserInteractionResponse;
+import main.exceptions.CustomUssdException;
 import main.service.implementations.customerSide.DisplayAndEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -21,19 +22,22 @@ public class CollectUserInputController {
     public ResponseEntity<String> collectUserInput(
             @RequestParam("sessionId") String sessionId,
             @RequestParam("serviceCode") String serviceCode,
-            @RequestParam(value = "text", defaultValue = "") String text) {
+            @RequestParam(value = "text", defaultValue = "") String text,
+            @RequestParam("phoneNumber") String phoneNumber) {
 
         try {
             UserInteractionRequest request = new UserInteractionRequest();
             request.setSessionId(sessionId);
             request.setServiceCode(serviceCode);
             request.setText(text);
+            request.setPhoneNumber(phoneNumber);
 
             UserInteractionResponse response = displayAndEntryService.processUserInput(request);
             return ResponseEntity.ok(response.getMessage());
-
+        } catch (CustomUssdException e) {
+            return ResponseEntity.ok(e.isEnd() ? "END " + e.getMessage() : "CON " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body("END An error occurred: " + e.getMessage());
+            return ResponseEntity.status(500).body("END An unexpected error occurred: " + e.getMessage());
         }
     }
 

@@ -1,6 +1,7 @@
 package main.controllers.users;
 
 import main.dtos.requests.customerFaceRequest.UserInteractionRequest;
+import main.dtos.requests.customerFaceRequest.UssdInteractionRequest;
 import main.dtos.responses.customerFaceResponse.UserInteractionResponse;
 import main.service.implementations.customerSide.DisplayAndEntryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,11 @@ public class SendCompanyResponseController {
 
     @PostMapping("/respond")
     public ResponseEntity<String> sendCompanyResponseToUser(
-            @RequestBody UserInteractionRequest userRequest,
-            @RequestBody UserInteractionResponse companyResponse) {
+            @RequestBody UssdInteractionRequest request) {
 
         try {
-            UserInteractionResponse response = displayAndEntryService.processCompanyResponse(userRequest, companyResponse);
+            UserInteractionResponse response = displayAndEntryService.processCompanyResponse(
+                    request.getUserRequest(), request.getCompanyResponse());
             return ResponseEntity.ok(response.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(500).body("END An error occurred: " + e.getMessage());

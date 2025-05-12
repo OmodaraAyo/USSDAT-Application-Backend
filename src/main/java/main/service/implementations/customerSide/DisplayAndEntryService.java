@@ -7,6 +7,7 @@ import main.dtos.requests.customerFaceRequest.UserInteractionRequest;
 import main.dtos.responses.customerFaceResponse.FetchMenuFromCompanyApiResponse;
 import main.dtos.responses.customerFaceResponse.FetchMenuFromCompanyDBResponse;
 import main.dtos.responses.customerFaceResponse.UserInteractionResponse;
+import main.exceptions.CustomUssdException;
 import main.models.users.UserSession;
 import main.service.interfaces.custmerSide.DisplayAndEntryInterface;
 import main.service.interfaces.custmerSide.FetchMenuServiceInterface;
@@ -26,51 +27,112 @@ public class DisplayAndEntryService implements DisplayAndEntryInterface {
 
     @Override
     public UserInteractionResponse processCompanyResponse(UserInteractionRequest request, UserInteractionResponse companyResponse) {
+        String sessionId = request.getSessionId();
+        UserSession userSession = userSessionStore.getSession(sessionId);
+        if (userSession == null) {
+            companyResponse.setMessage("END Session not found");
+            companyResponse.setIsEnd(true);
+            return companyResponse;
+        }
+
+        // Ensure proper prefix if not provided
+        if (!companyResponse.getMessage().startsWith("CON ") && !companyResponse.getMessage().startsWith("END ")) {
+            if (companyResponse.getIsEnd()) {
+                companyResponse.setMessage("END " + companyResponse.getMessage());
+            } else {
+                companyResponse.setMessage("CON " + companyResponse.getMessage());
+            }
+        }
+
+        // Handle options if provided
+        if (companyResponse.getOptions() != null && !companyResponse.getOptions().isEmpty()) {
+            StringBuilder menuText = new StringBuilder(companyResponse.getMessage() + "\n");
+            for (int i = 0; i < companyResponse.getOptions().size(); i++) {
+                menuText.append(i + 1).append(". ").append(companyResponse.getOptions().get(i).getTitle()).append("\n");
+            }
+            menuText.append("0. Quit");
+            companyResponse.setMessage(menuText.toString());
+        }
+
+        // Update session context if provided by company (assuming context is in companyResponse)
+        if (companyResponse.getMessage().contains("context:")) {
+            String[] parts = companyResponse.getMessage().split("context:");
+            if (parts.length > 1) {
+                userSession.setContext(parts[1].trim().split("\\s")[0]); // Extract context (simplified)
+            }
+        }
+
+        if (companyResponse.getIsEnd()) {
+            userSessionStore.removeSession(sessionId);
+        }
+
+        userSessionStore.saveSession(userSession);
+        return companyResponse;
+    }
+
+    @Override
+    public UserInteractionResponse processUserInput(UserInteractionRequest request) throws CustomUssdException {
         UserInteractionResponse response = new UserInteractionResponse();
         String sessionId = request.getSessionId();
         String serviceCode = request.getServiceCode();
         String text = request.getText();
+        String phoneNumber = request.getPhoneNumber();
 
-        // Get or create user session
+        System.out.println("Debug - ServiceCode: " + serviceCode + ", Text: " + text + ", PhoneNumber: " + phoneNumber);
+
         UserSession userSession = userSessionStore.getSession(sessionId);
         if (userSession == null) {
             userSession = new UserSession();
             userSession.setSessionId(sessionId);
+            userSession.setPhoneNumber(phoneNumber);
+            System.out.println("Debug - New session created for sessionId: " + sessionId);
+        } else {
+            System.out.println("Debug - Existing session found, SubCode: " + userSession.getSubCode() + ", Context: " + userSession.getContext());
         }
 
-        // Parse serviceCode to detect subcode
         String cleanedServiceCode = serviceCode.replace("#", "").replace("*", " ");
         String[] serviceCodeParts = cleanedServiceCode.trim().split("\\s+");
         String subCode = serviceCodeParts.length > 1 ? serviceCodeParts[1] : null;
         String storedSubCode = userSession.getSubCode();
 
-        // If no subcode, prompt user
-        if (subCode == null && storedSubCode == null && text.isEmpty()) {
+        System.out.println("Debug - CleanedServiceCode: " + cleanedServiceCode + ", SubCode: " + subCode + ", StoredSubCode: " + storedSubCode);
+
+        // Handle base USSD (*384#) to prompt for subcode, reject invalid USSD
+        if (serviceCode.equals("*384#") && (subCode == null || subCode.trim().isEmpty()) && (storedSubCode == null || storedSubCode.trim().isEmpty()) && text.isEmpty()) {
+            System.out.println("Debug - Base USSD (*384#) matched, returning prompt");
             response.setMessage("CON Enter company subcode:");
             response.setIsEnd(false);
             return response;
+        } else if (!serviceCode.equals("*384#") && subCode == null && (storedSubCode == null || storedSubCode.trim().isEmpty()) && text.isEmpty()) {
+            System.out.println("Debug - Invalid USSD code detected");
+            throw new CustomUssdException("Invalid USSD code. Use *384#.", true);
         }
 
-        // Set subcode from text, serviceCode, or session
-        if (storedSubCode == null && subCode == null && !text.isEmpty()) {
-            subCode = text.trim();
-            userSession.setSubCode(subCode);
-            userSession.setContext("main menu");
-        } else if (storedSubCode != null) {
+        // Set subcode only if explicitly provided via text or serviceCode with subcode
+        if (storedSubCode == null) {
+            if (subCode != null && !subCode.trim().isEmpty()) {
+                userSession.setSubCode(subCode);
+                userSession.setContext("main menu");
+                System.out.println("Debug - SubCode set from serviceCode: " + subCode);
+            } else if (!text.isEmpty()) {
+                subCode = text.trim();
+                userSession.setSubCode(subCode);
+                userSession.setContext("main menu");
+                System.out.println("Debug - SubCode set from text: " + subCode);
+            }
+        } else {
             subCode = storedSubCode;
-        } else if (subCode != null) {
-            userSession.setSubCode(subCode);
-            userSession.setContext("main menu");
+            System.out.println("Debug - Using stored SubCode: " + subCode);
         }
 
         if (subCode == null) {
-            response.setMessage("END Invalid subcode. Please try again.");
-            response.setIsEnd(true);
-            return response;
+            System.out.println("Debug - No valid subCode, throwing exception");
+            throw new CustomUssdException("Invalid subcode. Please try again.", true);
         }
 
         // Handle quit
         if ("0".equals(text)) {
+            System.out.println("Debug - Quit requested");
             userSessionStore.removeSession(sessionId);
             response.setMessage("END Goodbye!");
             response.setIsEnd(true);
@@ -79,11 +141,17 @@ public class DisplayAndEntryService implements DisplayAndEntryInterface {
 
         // Check user intent based on session context
         if ("main menu".equals(userSession.getContext())) {
-            // Fetch main menu from DB
+            System.out.println("Debug - Entering main menu logic for subCode: " + subCode);
             FetchMenuFromCompanyDBRequest dbRequest = new FetchMenuFromCompanyDBRequest();
             dbRequest.setSessionId(sessionId);
             dbRequest.setSubCode(subCode);
-            FetchMenuFromCompanyDBResponse dbResponse = fetchMenuService.fetchMainMenu(dbRequest);
+            FetchMenuFromCompanyDBResponse dbResponse;
+            try {
+                dbResponse = fetchMenuService.fetchMainMenu(dbRequest);
+            } catch (Exception e) {
+                System.out.println("Debug - Fetch menu failed: " + e.getMessage());
+                throw new CustomUssdException("Failed to fetch main menu: " + e.getMessage(), true);
+            }
 
             response.setMessage("CON " + dbResponse.getMessage() + "\n");
             if (dbResponse.getOptions() != null) {
@@ -94,14 +162,20 @@ public class DisplayAndEntryService implements DisplayAndEntryInterface {
                 response.setMessage(response.getMessage() + "0. Quit");
             }
             response.setIsEnd(false);
-            userSession.setContext("company_api"); // Move to next interaction
+            userSession.setContext("company_api");
         } else {
-            // Send to company API
+            System.out.println("Debug - Entering company API logic for subCode: " + subCode + ", Text: " + text);
             FetchMenuFromCompanyApiRequest apiRequest = new FetchMenuFromCompanyApiRequest();
             apiRequest.setSessionId(sessionId);
             apiRequest.setSubCode(subCode);
             apiRequest.setResponse(text);
-            FetchMenuFromCompanyApiResponse apiResponse = fetchMenuService.fetchMenuFromCompanyApi(apiRequest);
+            FetchMenuFromCompanyApiResponse apiResponse;
+            try {
+                apiResponse = fetchMenuService.fetchMenuFromCompanyApi(apiRequest);
+            } catch (Exception e) {
+                System.out.println("Debug - Fetch API failed: " + e.getMessage());
+                throw new CustomUssdException("Failed to fetch company menu: " + e.getMessage(), true);
+            }
 
             response.setMessage("CON " + apiResponse.getMessage());
             response.setIsEnd(false);
@@ -112,8 +186,4 @@ public class DisplayAndEntryService implements DisplayAndEntryInterface {
         return response;
     }
 
-    @Override
-    public UserInteractionResponse processUserInput(UserInteractionRequest request) {
-        return null;
-    }
 }

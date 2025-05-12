@@ -7,5 +7,6 @@ public class FetchMenuFromCompanyApiRequest {
     private String subCode;
     private String context;
     private String response;
+    private String sessionId;
 
 }
