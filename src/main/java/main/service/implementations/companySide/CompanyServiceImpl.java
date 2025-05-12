@@ -2,7 +2,10 @@ package main.service.implementations.companySide;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
-import main.dtos.requests.companyFaceRequest.*;
+import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
+import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
+import main.dtos.requests.companyFaceRequest.LoginRequest;
+import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.ValidatorException;
 import main.models.companies.Company;

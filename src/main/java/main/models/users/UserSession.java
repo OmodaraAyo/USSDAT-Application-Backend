@@ -10,6 +10,7 @@ public class UserSession {
     private String context;
     private int currentPage;
     private String lastResponse;
+    private String phoneNumber;
 
 //    public UserSession(String sessionId, String s, int i, String s1) {
 //    }
