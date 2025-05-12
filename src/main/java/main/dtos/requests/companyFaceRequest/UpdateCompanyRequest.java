@@ -5,13 +5,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class UpdateCompanyRequest {
-    private CompanyRequest companyRequest = new CompanyRequest();
-    private String lastLoginDate;
-    private String updatedAt;
+    private List<String> companyPhone;
+    private String businessRegistrationNumber;
+    private String category;
+    private String companyApiKey;
+    private String baseUrl;
 }
 

@@ -100,13 +100,12 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = authenticatedCompanyService.getCurrentAuthenticatedCompany();
         ValidatorException.validateId(companyId, company.getCompanyId());
         validateUpdateRequestData(updateRequest);
-        company.setCompanyPhone(updateRequest.getCompanyRequest().getCompanyPhone());
-//        company.setCategory(Category.valueOf(updateRequest.getCompanyRequest().getCategory()));
-        company.setCompanyApiKey(updateRequest.getCompanyRequest().getCompanyApiKey());
-        company.setBaseUrl(updateRequest.getCompanyRequest().getBaseUrl());
-        company.setLastLoginDate(updateRequest.getLastLoginDate());
+        company.setCompanyPhone(updateRequest.getCompanyPhone());
+        company.setCategory(Category.getCategory(updateRequest.getCategory()));
+        company.setCompanyApiKey(updateRequest.getCompanyApiKey());
+        company.setBaseUrl(updateRequest.getBaseUrl());
+        company.setLastLoginDate(company.getLastLoginDate());
         company.setUpdateAt(DateUtil.getCurrentDate());
-
         Company savedCompany = companyRepo.save(company);
         return getUpdatedCompany(savedCompany, updateRequest);
     }
@@ -186,22 +185,23 @@ public class CompanyServiceImpl implements CompanyService {
     private UpdateCompanyResponse getUpdatedCompany(Company savedCompany, UpdateCompanyRequest updateRequest) {
         UpdateCompanyResponse response = new UpdateCompanyResponse();
         response.setMessage("Updated Successfully");
-        response.getCompanyDetails().setCompanyId(savedCompany.getCompanyId());
-        response.getCompanyDetails().setUssdShortCode(savedCompany.getUssdShortCode());
-        response.getCompanyDetails().setCompanyName(savedCompany.getCompanyName());
-        response.getCompanyDetails().setCompanyPhone(savedCompany.getCompanyPhone());
-        response.getCompanyDetails().setCompanyEmail(savedCompany.getCompanyEmail());
-        response.getCompanyDetails().setBusinessRegistrationNumber(savedCompany.getBusinessRegistrationNumber());
-        response.getCompanyDetails().setCategory(savedCompany.getCategory());
-        response.getCompanyDetails().setCompanyApiKey(savedCompany.getCompanyApiKey());
-        response.getCompanyDetails().setBaseUrl(savedCompany.getBaseUrl());
-        response.getCompanyDetails().setRole(String.valueOf(savedCompany.getRole()));
-        response.getCompanyDetails().setActive(savedCompany.isActive());
-        response.getCompanyDetails().setFirstLogin(savedCompany.isFirstLogin());
-        response.getCompanyDetails().setLoggedIn(savedCompany.isLoggedIn());
-        response.getCompanyDetails().setLastLoginDate(savedCompany.getLastLoginDate());
-        response.getCompanyDetails().setCreateAt(savedCompany.getCreateAt());
-        response.getCompanyDetails().setUpdateAt(savedCompany.getUpdateAt());
+        response.setCompanyId(savedCompany.getCompanyId());
+//        response.getCompanyDetails().setCompanyId(savedCompany.getCompanyId());
+//        response.getCompanyDetails().setUssdShortCode(savedCompany.getUssdShortCode());
+//        response.getCompanyDetails().setCompanyName(savedCompany.getCompanyName());
+//        response.getCompanyDetails().setCompanyPhone(savedCompany.getCompanyPhone());
+//        response.getCompanyDetails().setCompanyEmail(savedCompany.getCompanyEmail());
+//        response.getCompanyDetails().setBusinessRegistrationNumber(savedCompany.getBusinessRegistrationNumber());
+//        response.getCompanyDetails().setCategory(savedCompany.getCategory());
+//        response.getCompanyDetails().setCompanyApiKey(savedCompany.getCompanyApiKey());
+//        response.getCompanyDetails().setBaseUrl(savedCompany.getBaseUrl());
+//        response.getCompanyDetails().setRole(String.valueOf(savedCompany.getRole()));
+//        response.getCompanyDetails().setActive(savedCompany.isActive());
+//        response.getCompanyDetails().setFirstLogin(savedCompany.isFirstLogin());
+//        response.getCompanyDetails().setLoggedIn(savedCompany.isLoggedIn());
+//        response.getCompanyDetails().setLastLoginDate(savedCompany.getLastLoginDate());
+//        response.getCompanyDetails().setCreateAt(savedCompany.getCreateAt());
+//        response.getCompanyDetails().setUpdateAt(savedCompany.getUpdateAt());
         return response;
     }
 
@@ -253,6 +253,7 @@ public class CompanyServiceImpl implements CompanyService {
         companyDetailsResponse.setBusinessRegistrationNumber(company.getBusinessRegistrationNumber());
         companyDetailsResponse.setCategory(company.getCategory());
         companyDetailsResponse.setApiKey(company.getApiKey());
+        companyDetailsResponse.setCompanyApiKey(company.getCompanyApiKey());
         companyDetailsResponse.setBaseUrl(company.getBaseUrl());
         companyDetailsResponse.setRole(company.getRole().name());
         companyDetailsResponse.setActive(company.isActive());

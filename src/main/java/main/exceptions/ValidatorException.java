@@ -72,16 +72,16 @@ public class ValidatorException extends RuntimeException {
     }
 
     public static void validateUpdateRequestDetails(UpdateCompanyRequest request){
-        if(request.getCompanyRequest().getCompanyPhone() == null || request.getCompanyRequest().getCompanyPhone().isEmpty()) {
+        if(request.getCompanyPhone() == null || request.getCompanyPhone().isEmpty()) {
             throw new ValidatorException("At least one phone number is required");
         }
-        if(request.getCompanyRequest().getCategory() == null || request.getCompanyRequest().getCategory().trim().isEmpty()) {
+        if(request.getCategory() == null || request.getCategory().trim().isEmpty()) {
             throw new ValidatorException("Category is required");
         }
-        if(request.getCompanyRequest().getCompanyApiKey() == null || request.getCompanyRequest().getCompanyApiKey().trim().isEmpty()) {
+        if(request.getCompanyApiKey() == null || request.getCompanyApiKey().trim().isEmpty()) {
             throw new ValidatorException("Api key is required");
         }
-        if(request.getCompanyRequest().getBaseUrl() == null || request.getCompanyRequest().getBaseUrl().trim().isEmpty()) {
+        if(request.getBaseUrl() == null || request.getBaseUrl().trim().isEmpty()) {
             throw new ValidatorException("Base url is required");
         }
     }

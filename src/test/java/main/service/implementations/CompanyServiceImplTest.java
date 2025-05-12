@@ -352,10 +352,10 @@ public class CompanyServiceImplTest {
         assertTrue(company.isLoggedIn());
 
         UpdateCompanyRequest updateRequest = new UpdateCompanyRequest();
-        updateRequest.getCompanyRequest().setCompanyPhone(List.of("09012345678"));
-        updateRequest.getCompanyRequest().setCategory("FINANCE");
-        updateRequest.getCompanyRequest().setCompanyApiKey("T9uO8N4v1GZrWQX9F2lRA2J7oTxkCWy6G9gO2A7GJvLkN2vEr3nE9QjV7Q0e3lKpFeXvQ0L1OZoQmQkz009xYtFAK");
-        updateRequest.getCompanyRequest().setBaseUrl("https://api.example.com/");
+        updateRequest.setCompanyPhone(List.of("09012345678"));
+        updateRequest.setCategory("FINANCE");
+        updateRequest.setCompanyApiKey("T9uO8N4v1GZrWQX9F2lRA2J7oTxkCWy6G9gO2A7GJvLkN2vEr3nE9QjV7Q0e3lKpFeXvQ0L1OZoQmQkz009xYtFAK");
+        updateRequest.setBaseUrl("https://api.example.com/");
         UpdateCompanyResponse updatedCompany = companyService.updateCompanyDetails(company.getCompanyId(),updateRequest);
         assertEquals("Updated Successfully", updatedCompany.getMessage());
         assertTrue(company.isLoggedIn());
