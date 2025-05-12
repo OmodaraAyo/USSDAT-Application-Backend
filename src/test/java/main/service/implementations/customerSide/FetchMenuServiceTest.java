@@ -1,5 +1,5 @@
 package main.service.implementations.customerSide;
-
+//import main.dtos.responses.customerFaceResponse.FetchMenuFromCompanyDBResponse;
 import main.dtos.requests.customerFaceRequest.FetchMenuFromCompanyDBRequest;
 import main.dtos.responses.customerFaceResponse.FetchMenuFromCompanyDBResponse;
 import main.exceptions.CompanyNotFound;
@@ -7,19 +7,20 @@ import main.models.companies.Company;
 import main.models.companies.Menu;
 import main.models.companies.Option;
 import main.repositories.CompanyRepo;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static de.flapdoodle.embed.process.io.Files.deleteAll;
 import static org.junit.jupiter.api.Assertions.*;
+
+
 @SpringBootTest
+@ComponentScan(basePackages = "main.service.implementations")
 class FetchMenuServiceTest {
 
     @Autowired
@@ -27,10 +28,14 @@ class FetchMenuServiceTest {
 
     @Autowired
     private FetchMenuService fetchMenuService;
+
     @BeforeEach
     void setUp() {
         Company testCompany = new Company();
-        testCompany.setUssdShortCode("13345");
+        testCompany.setUssdShortCode("45674");
+
+//        Company testCompany2 = new Company();
+//        testCompany2.setUssdShortCode("11111");
 
         Menu testMenu = new Menu();
         List<Option> options = new ArrayList<>();
@@ -74,7 +79,7 @@ class FetchMenuServiceTest {
     @Test
     void testFetchMainMenu_Success() {
         FetchMenuFromCompanyDBRequest request = new FetchMenuFromCompanyDBRequest();
-        request.setSubCode("13345");
+        request.setSubCode("45674");
 
         FetchMenuFromCompanyDBResponse response = fetchMenuService.fetchMainMenu(request);
 

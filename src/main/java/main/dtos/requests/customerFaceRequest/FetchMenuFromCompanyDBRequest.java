@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class FetchMenuFromCompanyDBRequest {
     private String subCode;
-
+    private String sessionId;
 }
