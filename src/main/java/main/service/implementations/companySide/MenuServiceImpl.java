@@ -33,8 +33,11 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public Menu createDefaultMenu() {
-        menuRepo.save(new Menu());
-        return null;
+        Menu menu = new Menu();
+//        menu.setCompanyId(companyId);
+        menu.setCreatedAt(DateUtil.getCurrentDate());
+        menu.setUpdatedAt(DateUtil.getCurrentDate());
+        return menuRepo.save(menu);
     }
 
     @Override
@@ -45,7 +48,6 @@ public class MenuServiceImpl implements MenuService {
         ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
         String generatedOptionId = generateOptionId();
         Company savedCompany = createNewOption(activeCompanySession, optionRequest, generatedOptionId);
-
         CreatedOptionResponse createdOptionResponse = new CreatedOptionResponse();
         createdOptionResponse.setCompanyId(savedCompany.getCompanyId());
         createdOptionResponse.setMenuId(savedCompany.getMenu().getId());
