@@ -44,6 +44,9 @@ public class SecurityConfig {
     @Value("${FRONTEND_TEST_URL}")
     private String frontendTestUrl;
 
+    @Value("${USER_SIDE}")
+    private String userSide;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -66,7 +69,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(List.of(frontendUrl, testUrl, frontendTestUrl));
+        configuration.setAllowedOrigins(List.of(frontendUrl, testUrl, frontendTestUrl, userSide));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
