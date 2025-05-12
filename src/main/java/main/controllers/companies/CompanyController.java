@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/company")
+///api/v1/admin/**
 public class CompanyController {
 
     @Autowired
@@ -41,29 +42,29 @@ public class CompanyController {
 
     @PatchMapping("/{companyId}/password-reset")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<ChangePasswordResponse>> resetPassword(@PathVariable String companyId, @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
+    public ResponseEntity<ApiResponse<ChangePasswordResponse>> resetPassword(@PathVariable("companyId") String companyId, @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
         ChangePasswordResponse changePasswordResponse = companyService.resetPassword(companyId,changePasswordRequest);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", changePasswordResponse));
     }
 
-    @PatchMapping("/{company_id}")
+    @PatchMapping("/{companyId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<UpdateCompanyResponse>> updateCompanyDetails(@PathVariable String company_id, @Valid @RequestBody UpdateCompanyRequest updateCompanyRequest) {
-        UpdateCompanyResponse updateCompanyResponse = companyService.updateCompanyDetails(company_id, updateCompanyRequest);
+    public ResponseEntity<ApiResponse<UpdateCompanyResponse>> updateCompanyDetails(@PathVariable("companyId") String companyId, @Valid @RequestBody UpdateCompanyRequest payload) {
+        UpdateCompanyResponse updateCompanyResponse = companyService.updateCompanyDetails(companyId, payload);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", updateCompanyResponse));
     }
 
-    @PatchMapping("/{company_id}/deactivate")
+    @PatchMapping("/{companyId}/deactivate")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<DeleteCompanyAccountResponse>> closeAccount(@PathVariable String company_id) {
-        DeleteCompanyAccountResponse deleteCompanyAccountResponse = companyService.deactivateCompany(company_id);
+    public ResponseEntity<ApiResponse<DeleteCompanyAccountResponse>> closeAccount(@PathVariable("companyId") String companyId) {
+        DeleteCompanyAccountResponse deleteCompanyAccountResponse = companyService.deactivateCompany(companyId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", deleteCompanyAccountResponse));
     }
 
-    @PatchMapping("/{company_id}/logout")
+    @PatchMapping("/{companyId}/logout")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<LogoutResponse>> logout(@PathVariable String company_id) {
-        LogoutResponse logoutResponse = companyService.logOut(company_id);
+    public ResponseEntity<ApiResponse<LogoutResponse>> logout(@PathVariable String companyId) {
+        LogoutResponse logoutResponse = companyService.logOut(companyId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", logoutResponse));
     }
 }

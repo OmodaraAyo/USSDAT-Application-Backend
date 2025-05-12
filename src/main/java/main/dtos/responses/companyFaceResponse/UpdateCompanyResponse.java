@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class UpdateCompanyResponse {
     private String message;
-    private CompanyDetailsResponse companyDetails = new CompanyDetailsResponse();
+    private String companyId;
+//    private CompanyDetailsResponse companyDetails = new CompanyDetailsResponse();
 }
 
