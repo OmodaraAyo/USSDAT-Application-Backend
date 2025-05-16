@@ -1,5 +1,6 @@
 package main.controllers.companies;
 
+import jakarta.validation.Valid;
 import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
 import main.dtos.requests.companyFaceRequest.UpdateOptionRequest;
 import main.dtos.responses.companyFaceResponse.*;
@@ -17,45 +18,45 @@ public class MenuController {
     @Autowired
     private MenuService menuService;
 
-    @PostMapping("/{company_id}/addOption")
+    @PostMapping("/{companyId}/menus/addOption")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<CreatedOptionResponse>> addNewOption(@PathVariable("company_id") String company_id, CreateOptionRequest createOptionRequest){
-        CreatedOptionResponse createdOptionResponse = menuService.addNewOption(company_id,createOptionRequest);
+    public ResponseEntity<ApiResponse<CreatedOptionResponse>> addNewOption(@PathVariable("companyId") String companyId, @Valid @RequestBody CreateOptionRequest payload){
+        CreatedOptionResponse createdOptionResponse = menuService.addNewOption(companyId,payload);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", createdOptionResponse));
     }
 
-    @GetMapping("/{company_id}/options/title")
+    @GetMapping("/{companyId}/menus/options/title")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<MenuOptionResponse>> getMenuOptionByTitle(@PathVariable("company_id") String companyId, @RequestParam String title){
+    public ResponseEntity<ApiResponse<MenuOptionResponse>> getMenuOptionByTitle(@PathVariable("companyId") String companyId, @RequestParam String title){
         MenuOptionResponse menuOptionResponse = menuService.getMenuOptionByTitle(companyId, title);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", menuOptionResponse));
     }
 
-    @GetMapping("/{company_id}/options/{option_id}")
+    @GetMapping("/{companyId}/menus/options/{optionId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<MenuOptionResponse>> getMenuOptionById(@PathVariable("company_id") String companyId, @PathVariable String option_id){
-        MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(companyId, option_id);
+    public ResponseEntity<ApiResponse<MenuOptionResponse>> getMenuOptionById(@PathVariable("companyId") String companyId, @PathVariable String optionId){
+        MenuOptionResponse menuOptionResponse = menuService.getMenuOptionById(companyId, optionId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", menuOptionResponse));
     }
 
-    @DeleteMapping("/{company_id}/options/{option_id}")
+    @DeleteMapping("/{companyId}/menus/options/{optionId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<DeleteMenuOptionResponse>> deleteMenuOptionById(@PathVariable("company_id") String company_id, @PathVariable("option_id") String option_id){
-        DeleteMenuOptionResponse deletedMenuOptionResponse = menuService.deleteMenuOptionById(company_id,option_id);
+    public ResponseEntity<ApiResponse<DeleteMenuOptionResponse>> deleteMenuOptionById(@PathVariable("companyId") String companyId, @PathVariable("optionId") String optionId){
+        DeleteMenuOptionResponse deletedMenuOptionResponse = menuService.deleteMenuOptionById(companyId,optionId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", deletedMenuOptionResponse));
     }
 
-    @PatchMapping("/{company_id}/options/{option_id}")
+    @PatchMapping("/{companyId}/menus/options/{optionId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<UpdateOptionResponse>> updateMenuOptionById(@PathVariable String company_id, @PathVariable String option_id, UpdateOptionRequest updateOptionRequest){
-        UpdateOptionResponse updateOptionResponse = menuService.updateMenuOption(company_id, option_id, updateOptionRequest);
+    public ResponseEntity<ApiResponse<UpdateOptionResponse>> updateMenuOptionById(@PathVariable("companyId") String companyId, @PathVariable("optionId") String optionId, @Valid @RequestBody UpdateOptionRequest payload){
+        UpdateOptionResponse updateOptionResponse = menuService.updateMenuOption(companyId, optionId, payload);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", updateOptionResponse));
     }
 
-    @GetMapping("/{company_id}/options")
+    @GetMapping("/{companyId}/menus/options")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<CompanyMenuOptionsResponse>> getCompanyAllOptions(@PathVariable("company_id") String company_id){
-        CompanyMenuOptionsResponse companyMenuOptionsResponse = menuService.getMenuOptionsForCompany(company_id);
+    public ResponseEntity<ApiResponse<CompanyMenuOptionsResponse>> getCompanyAllOptions(@PathVariable("companyId") String companyId){
+        CompanyMenuOptionsResponse companyMenuOptionsResponse = menuService.getMenuOptionsForCompany(companyId);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", companyMenuOptionsResponse));
     }
 }

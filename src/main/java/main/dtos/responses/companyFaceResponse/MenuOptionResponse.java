@@ -10,6 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MenuOptionResponse {
+    private String optionId;
     private String title;
     private boolean isSuccess;
 }
