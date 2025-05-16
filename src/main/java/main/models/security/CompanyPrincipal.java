@@ -1,6 +1,6 @@
 package main.models.security;
 
-import main.models.users.Company;
+import main.models.companies.Company;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +17,10 @@ public class CompanyPrincipal implements UserDetails {
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if (company.getRole() == null) {
+            return Collections.emptyList();
+        }
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + company.getRole().name()));
     }
 
     @Override
