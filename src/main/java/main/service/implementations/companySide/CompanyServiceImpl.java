@@ -2,13 +2,11 @@ package main.service.implementations.companySide;
 
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoWriteException;
-import main.dtos.requests.companyFaceRequest.ChangePasswordRequest;
-import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
-import main.dtos.requests.companyFaceRequest.LoginRequest;
-import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
+import main.dtos.requests.companyFaceRequest.*;
 import main.dtos.responses.companyFaceResponse.*;
 import main.exceptions.ValidatorException;
 import main.models.companies.Company;
+import main.models.companies.Option;
 import main.models.enums.Category;
 import main.models.enums.Role;
 import main.repositories.CompanyRepo;
@@ -28,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -256,6 +255,7 @@ public class CompanyServiceImpl implements CompanyService {
         companyDetailsResponse.setBusinessRegistrationNumber(company.getBusinessRegistrationNumber());
         companyDetailsResponse.setCategory(company.getCategory());
         companyDetailsResponse.setApiKey(company.getApiKey());
+        companyDetailsResponse.setOptions(mapOptionsToOptionResponses(company.getMenu().getOptions()));
         companyDetailsResponse.setCompanyApiKey(company.getCompanyApiKey());
         companyDetailsResponse.setBaseUrl(company.getBaseUrl());
         companyDetailsResponse.setRole(company.getRole().name());
@@ -265,6 +265,10 @@ public class CompanyServiceImpl implements CompanyService {
         companyDetailsResponse.setLastLoginDate(company.getLastLoginDate());
         companyDetailsResponse.setCreateAt(company.getCreateAt());
         companyDetailsResponse.setUpdateAt(company.getUpdateAt());
+    }
+
+    private List<OptionResponse> mapOptionsToOptionResponses(List<Option> options) {
+        return options.stream().map(option -> new OptionResponse(option.getMenuId(), option.getOptionId(), option.getTitle(), option.getCreatedAt(), option.getUpdatedAt())).collect(Collectors.toList());
     }
 
     private CompanyDetailsResponse companyDetailsWithWarning(Company company) {

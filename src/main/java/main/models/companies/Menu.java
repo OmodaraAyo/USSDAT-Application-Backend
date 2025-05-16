@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class Menu {
     @Indexed
-    private String companyId;
+//    private String companyId;
     @Id
     private String id;
 //    @Setter(AccessLevel.NONE)
