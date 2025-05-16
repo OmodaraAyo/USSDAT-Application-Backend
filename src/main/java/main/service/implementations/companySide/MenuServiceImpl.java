@@ -147,7 +147,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuOptionResponse getAuthenticatedCompanyMenuOptionById(Company activeCompanySession, String optionId) {
         for (Option option : activeCompanySession.getMenu().getOptions()) {
             if (option.getOptionId().equals(optionId)) {
-                return new MenuOptionResponse(option.getTitle(), true);
+                return new MenuOptionResponse(option.getOptionId() ,option.getTitle(), true);
             }
         }
         throw new MenuOptionNotFoundException(String.format("No menu option found with this id: \"%s\".", optionId));
@@ -180,7 +180,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuOptionResponse getAuthenticatedCompanyOptionByTitle(Company company, String titleRequest) {
         for(Option option : company.getMenu().getOptions()){
                 if (option.getTitle().equalsIgnoreCase(titleRequest)){
-                    return new MenuOptionResponse(option.getTitle(), true);
+                    return new MenuOptionResponse(option.getOptionId(), option.getTitle(), true);
                 }
             }
         throw new MenuOptionNotFoundException(String.format("No menu option found with the title \"%s\".", titleRequest));

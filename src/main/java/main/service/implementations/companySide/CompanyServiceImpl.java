@@ -103,6 +103,7 @@ public class CompanyServiceImpl implements CompanyService {
         ValidatorException.validateId(companyId, company.getCompanyId());
         validateUpdateRequestData(updateRequest);
         company.setCompanyPhone(updateRequest.getCompanyPhone());
+        company.setBusinessRegistrationNumber(updateRequest.getBusinessRegistrationNumber());
         company.setCategory(Category.getCategory(updateRequest.getCategory()));
         company.setCompanyApiKey(updateRequest.getCompanyApiKey());
         company.setBaseUrl(updateRequest.getBaseUrl());
