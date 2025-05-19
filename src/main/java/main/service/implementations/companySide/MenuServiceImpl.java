@@ -45,18 +45,10 @@ public class MenuServiceImpl implements MenuService {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
         ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         ValidatorException.validateOptionRequest(optionRequest.getTitle());
-        ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest);
+        ValidatorException.validateDuplicateTitle(activeCompanySession, optionRequest.getTitle());
         String generatedOptionId = generateOptionId();
         Company savedCompany = createNewOption(activeCompanySession, optionRequest, generatedOptionId);
-        CreatedOptionResponse createdOptionResponse = new CreatedOptionResponse();
-        createdOptionResponse.setCompanyId(savedCompany.getCompanyId());
-        createdOptionResponse.setMenuId(savedCompany.getMenu().getId());
-        createdOptionResponse.setOptionId(generatedOptionId);
-        createdOptionResponse.setTitle(optionRequest.getTitle());
-        createdOptionResponse.setResponse("Awesome! Your menu is now live.");
-        createdOptionResponse.setSuccess(true);
-        return createdOptionResponse;
-//        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), generatedOptionId, "Awesome! Your menu is now live.", true);
+        return new CreatedOptionResponse(savedCompany.getCompanyId(), savedCompany.getMenu().getId(), optionRequest.getTitle(), generatedOptionId, "Awesome! Your menu is now live.", true);
     }
 
     @Override
@@ -88,6 +80,8 @@ public class MenuServiceImpl implements MenuService {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
         ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
+        ValidatorException.validateOptionRequest(updateOptionRequest.getNewMenuTitle());
+        ValidatorException.validateDuplicateTitle(activeCompanySession, updateOptionRequest.getNewMenuTitle());
         return updatedOptionResponse(activeCompanySession, optionId, updateOptionRequest);
     }
 
@@ -106,12 +100,12 @@ public class MenuServiceImpl implements MenuService {
     private UpdateOptionResponse updatedOptionResponse(Company activeCompanySession, String optionId, UpdateOptionRequest updateOptionRequest) {
         Option thisOption = fetchMenuById(activeCompanySession, optionId);
         assert thisOption != null;
-        thisOption.setTitle(updateOptionRequest.getNewOptionName());
+        thisOption.setTitle(updateOptionRequest.getNewMenuTitle());
         thisOption.setUpdatedAt(DateUtil.getCurrentDate());
         updateOption(thisOption, activeCompanySession.getMenu().getOptions(), optionId);
         menuRepo.save(activeCompanySession.getMenu());
         companyUpdateSaver.saveUpdatedCompany(activeCompanySession);
-        return new UpdateOptionResponse(thisOption.getOptionId(), true, DateUtil.getCurrentDate());
+        return new UpdateOptionResponse(thisOption.getOptionId(), "Menu updated successfully." ,true, DateUtil.getCurrentDate());
     }
 
     private void updateOption(Option thisOption, List<Option> options, String optionId) {
@@ -147,16 +141,17 @@ public class MenuServiceImpl implements MenuService {
     private MenuOptionResponse getAuthenticatedCompanyMenuOptionById(Company activeCompanySession, String optionId) {
         for (Option option : activeCompanySession.getMenu().getOptions()) {
             if (option.getOptionId().equals(optionId)) {
-                return new MenuOptionResponse(option.getTitle(), true);
+                return new MenuOptionResponse(option.getOptionId() ,option.getTitle(), true);
             }
         }
         throw new MenuOptionNotFoundException(String.format("No menu option found with this id: \"%s\".", optionId));
     }
 
-    private DeleteMenuOptionResponse deleteMenu(Company company, String menuId) {
-        Option getMenuOption = fetchMenuById(company, menuId);
+    private DeleteMenuOptionResponse deleteMenu(Company activeCompanySession, String menuId) {
+        Option getMenuOption = fetchMenuById(activeCompanySession, menuId);
         if(getMenuOption != null) {
-            company.getMenu().getOptions().remove(getMenuOption);
+            activeCompanySession.getMenu().getOptions().remove(getMenuOption);
+            companyUpdateSaver.saveUpdatedCompany(activeCompanySession);
             return new DeleteMenuOptionResponse("Deleted successfully.", true);
         }
         return new DeleteMenuOptionResponse("Menu not found.", false);
@@ -180,7 +175,7 @@ public class MenuServiceImpl implements MenuService {
     private MenuOptionResponse getAuthenticatedCompanyOptionByTitle(Company company, String titleRequest) {
         for(Option option : company.getMenu().getOptions()){
                 if (option.getTitle().equalsIgnoreCase(titleRequest)){
-                    return new MenuOptionResponse(option.getTitle(), true);
+                    return new MenuOptionResponse(option.getOptionId(), option.getTitle(), true);
                 }
             }
         throw new MenuOptionNotFoundException(String.format("No menu option found with the title \"%s\".", titleRequest));
