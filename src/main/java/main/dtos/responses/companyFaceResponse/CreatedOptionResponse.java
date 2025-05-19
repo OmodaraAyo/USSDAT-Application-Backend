@@ -16,5 +16,4 @@ public class CreatedOptionResponse {
     private String optionId;
     private String response;
     private boolean isSuccess;
-
 }

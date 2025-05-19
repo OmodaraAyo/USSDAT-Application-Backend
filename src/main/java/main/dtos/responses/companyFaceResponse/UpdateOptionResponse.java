@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class UpdateOptionResponse {
     private String optionId;
+    private String message;
     private boolean isSuccess;
     private String updatedAt;
 }
