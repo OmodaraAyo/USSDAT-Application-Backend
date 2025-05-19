@@ -92,10 +92,10 @@ public class ValidatorException extends RuntimeException {
         }
     }
 
-    public static void validateDuplicateTitle(Company activeCompanySession, CreateOptionRequest optionRequest) {
+    public static void validateDuplicateTitle(Company activeCompanySession, String optionRequest) {
         for (Option option : activeCompanySession.getMenu().getOptions()) {
-            if (option.getTitle().equalsIgnoreCase(optionRequest.getTitle())) {
-                throw new ValidatorException("Oops! A menu titled 'Register' already exists. Please try another name.");
+            if (option.getTitle().equalsIgnoreCase(optionRequest)) {
+                throw new ValidatorException("Oops! A menu titled '"+ optionRequest + "' already exists. Please try another name.");
             }
         }
     }
