@@ -117,6 +117,7 @@ public class CompanyServiceImpl implements CompanyService {
     public ChangePasswordResponse resetPassword(String companyId, ChangePasswordRequest changePasswordRequest) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
         ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
+        ValidatorException.validateNewPassword(changePasswordRequest.getNewPassword(), changePasswordRequest.getConfirmPassword());
         if(!bCryptPasswordEncoder.matches(changePasswordRequest.getOldPassword(), activeCompanySession.getPassword())) {
             throw new ValidatorException("The provided old password does not match our records");
         }
@@ -294,6 +295,7 @@ public class CompanyServiceImpl implements CompanyService {
     private LoginResponse createLoginResponseWithoutWarning(LoginRequest loginRequest, CompanyDetailsResponse getCurrentLoggedInCompany) {
         LoginResponse loginResponse = new LoginResponse();
         loginResponse.setX_y_z(jwtService.generateToken(loginRequest.getCompanyEmail().toLowerCase(), getCurrentLoggedInCompany.getRole()));
+        loginResponse.setRef(getCurrentLoggedInCompany.getCompanyId());
         loginResponse.setResponse("Login Successful");
         loginResponse.setIsLoggedIn(true);
         loginResponse.setFirstLogin(getCurrentLoggedInCompany.isFirstLogin());

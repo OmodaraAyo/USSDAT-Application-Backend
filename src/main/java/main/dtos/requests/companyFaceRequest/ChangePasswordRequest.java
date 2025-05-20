@@ -13,4 +13,5 @@ import lombok.Setter;
 public class ChangePasswordRequest {
     private String oldPassword;
     @Size(min = 9) private String newPassword;
+    @Size(min = 9) private String confirmPassword;
 }

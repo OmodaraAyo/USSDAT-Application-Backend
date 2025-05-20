@@ -1,6 +1,7 @@
 package main.exceptions;
 
 
+import jakarta.validation.constraints.Size;
 import main.dtos.requests.companyFaceRequest.CompanySignUpRequest;
 import main.dtos.requests.companyFaceRequest.CreateOptionRequest;
 import main.dtos.requests.companyFaceRequest.UpdateCompanyRequest;
@@ -106,6 +107,12 @@ public class ValidatorException extends RuntimeException {
         }
         if(!companyId.equals(companyId1)){
             throw new ValidatorException("Id mismatch");
+        }
+    }
+
+    public static void validateNewPassword(@Size(min = 9) String newPassword, @Size(min = 9) String confirmPassword) {
+        if(!newPassword.equals(confirmPassword)){
+            throw new ValidatorException("New password and confirm password do not match.");
         }
     }
 }
