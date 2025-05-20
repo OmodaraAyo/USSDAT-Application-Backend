@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/company")
-///api/v1/admin/**
 public class CompanyController {
 
     @Autowired
@@ -42,8 +41,8 @@ public class CompanyController {
 
     @PatchMapping("/{companyId}/password-reset")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<ChangePasswordResponse>> resetPassword(@PathVariable("companyId") String companyId, @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
-        ChangePasswordResponse changePasswordResponse = companyService.resetPassword(companyId,changePasswordRequest);
+    public ResponseEntity<ApiResponse<ChangePasswordResponse>> resetPassword(@PathVariable("companyId") String companyId, @Valid @RequestBody ChangePasswordRequest payload) {
+        ChangePasswordResponse changePasswordResponse = companyService.resetPassword(companyId,payload);
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>("success", changePasswordResponse));
     }
 

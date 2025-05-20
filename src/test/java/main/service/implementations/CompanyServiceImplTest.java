@@ -347,7 +347,7 @@ public class CompanyServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        ChangePasswordResponse request = companyService.resetPassword(company.getCompanyId(),new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        ChangePasswordResponse request = companyService.resetPassword(company.getCompanyId(),new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$", "Ayodele01$"));
         assertEquals("Password changed successfully", request.getMessage());
         assertTrue(company.isLoggedIn());
 
@@ -370,7 +370,7 @@ public class CompanyServiceImplTest {
     public void shouldRejectUpdateWhenUserIsUnauthenticated(){
         assertFalse(signUpResponse.isIsLoggedIn());
         AuthenticationServiceException exception = assertThrows(AuthenticationServiceException.class, () -> {
-            companyService.resetPassword("1234567", new ChangePasswordRequest("wagwan1234", "Ayodele01$"));
+            companyService.resetPassword("1234567", new ChangePasswordRequest("wagwan1234", "Ayodele01$", "Ayodele01$"));
         });
         assertEquals("Authentication required.", exception.getMessage());
     }
@@ -412,7 +412,7 @@ public class CompanyServiceImplTest {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        ChangePasswordResponse request = companyService.resetPassword(refreshCompany.getCompanyId(), new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$"));
+        ChangePasswordResponse request = companyService.resetPassword(refreshCompany.getCompanyId(), new ChangePasswordRequest(registeredCompanyPassword1, "Ayodele01$", "Ayodele01$"));
         assertEquals("Password changed successfully", request.getMessage());
         assertTrue(refreshCompany.isLoggedIn());
 
