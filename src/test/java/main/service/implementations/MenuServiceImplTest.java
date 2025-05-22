@@ -524,14 +524,14 @@ public class MenuServiceImplTest {
 //        assertThat(refreshSecondCompany2II.getMenu().getOptions(), hasSize(2));
 //    }
 
-    @Test
-    public void test(){
-        CompanySignUpRequest companySignUpRequest = new CompanySignUpRequest();
-        companySignUpRequest.setCompanyName("Unius");
-        companySignUpRequest.setCompanyEmail("pablo1234@gmail.com");
-        companySignUpRequest.setCompanyPhone(List.of("09012345678"));
-        companySignUpRequest.setCategory("finance");
-        companySignUpRequest.setBusinessRegistrationNumber("123456789");
-        companyService.registerCompany(companySignUpRequest);
-    }
+//    @Test
+//    public void test(){
+//        CompanySignUpRequest companySignUpRequest = new CompanySignUpRequest();
+//        companySignUpRequest.setCompanyName("Unius");
+//        companySignUpRequest.setCompanyEmail("pablo1234@gmail.com");
+//        companySignUpRequest.setCompanyPhone(List.of("09012345678"));
+//        companySignUpRequest.setCategory("finance");
+//        companySignUpRequest.setBusinessRegistrationNumber("123456789");
+//        companyService.registerCompany(companySignUpRequest);
+//    }
 }
