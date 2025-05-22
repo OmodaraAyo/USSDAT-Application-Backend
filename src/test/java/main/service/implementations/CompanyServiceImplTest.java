@@ -41,17 +41,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 public class CompanyServiceImplTest {
 
-    @Autowired
-    private CompanyRepo companyRepo;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
-
-    @Autowired
-    private CompanyService companyService;
-
-    private CompanySignUpResponse signUpResponse;
+//    @Autowired
+//    private CompanyRepo companyRepo;
+//
+//    @Autowired
+//    private MongoTemplate mongoTemplate;
+//
+//
+//    @Autowired
+//    private CompanyService companyService;
+//
+//    private CompanySignUpResponse signUpResponse;
 
 //    @BeforeEach
 //    public void startAllWithThis(){
