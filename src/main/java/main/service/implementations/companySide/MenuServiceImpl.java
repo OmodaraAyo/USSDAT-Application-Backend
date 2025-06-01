@@ -14,6 +14,7 @@ import main.service.interfaces.companySide.MenuService;
 import main.utils.DateUtil;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -86,11 +87,12 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    public CompanyMenuOptionsResponse getMenuOptionsForCompany(String companyMenuOptionsRequest) {
+    public CompanyMenuOptionsResponse getMenuOptionsForCompany(String companyId) {
         Company activeCompanySession = authenticatedCompanyService.getCurrentAuthenticatedCompany();
-        ValidatorException.validateId(companyMenuOptionsRequest, activeCompanySession.getCompanyId());
+        ValidatorException.validateId(companyId, activeCompanySession.getCompanyId());
         checkIfActiveCompanySessionHaveAMenu(activeCompanySession.getMenu().getOptions());
         CompanyMenuOptionsResponse companyMenuOptionsResponse = new CompanyMenuOptionsResponse();
+        companyMenuOptionsResponse.setCompanyId(activeCompanySession.getCompanyId());
         for(Option option : activeCompanySession.getMenu().getOptions()){
             companyMenuOptionsResponse.getMenuOptions().add(option.getTitle());
         }

@@ -13,10 +13,8 @@ import java.util.List;
 @Setter
 public class Menu {
     @Indexed
-//    private String companyId;
     @Id
     private String id;
-//    @Setter(AccessLevel.NONE)
     private List<Option> options = new ArrayList<>();
     private String createdAt;
     private String updatedAt;
